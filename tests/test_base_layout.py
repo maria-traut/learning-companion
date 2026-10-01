@@ -44,6 +44,14 @@ def test_base_layout_links_pinned_pico_css_from_cdn():
     assert 'rel="stylesheet"' in pico_link_tag(html)
 
 
+def test_base_layout_pico_link_has_subresource_integrity():
+    html = render_to_string("base.html")
+
+    link = pico_link_tag(html)
+    assert re.search(r'integrity="sha384-[A-Za-z0-9+/]{64}"', link)
+    assert 'crossorigin="anonymous"' in link
+
+
 def test_base_layout_nav_links_app_name_to_home():
     html = render_to_string("base.html")
 
