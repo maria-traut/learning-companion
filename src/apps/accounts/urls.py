@@ -1,7 +1,6 @@
-from django.contrib.auth.views import LoginView
 from django.urls import path
 
-from .views import SignUpView
+from .views import LoginView, SignUpView
 
 app_name = "accounts"
 

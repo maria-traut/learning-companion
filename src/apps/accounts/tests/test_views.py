@@ -104,3 +104,13 @@ def test_valid_login_redirects_home_and_authenticates(client, user):
     assert response.status_code == 302
     assert response.url == "/"
     assert client.session["_auth_user_id"] == str(user.pk)
+
+
+@pytest.mark.django_db
+def test_login_shows_welcome_message(client, user):
+    response = client.post(
+        "/accounts/login/", {"username": "ada", "password": PASSWORD}, follow=True
+    )
+
+    assert response.redirect_chain == [("/", 302)]
+    assert "Welcome, ada" in messages_text(response)
