@@ -110,3 +110,7 @@
 2026-10-01T21:29:13+02:00 TESTS red (after tests/test_base_layout.py)
 2026-10-01T21:29:25+02:00 WRITE src/templates/base.html
 2026-10-01T21:29:28+02:00 TESTS green (after src/templates/base.html)
+2026-10-01T21:29:41+02:00 WRITE tests/test_base_layout.py
+2026-10-01T21:29:44+02:00 TESTS red (after tests/test_base_layout.py)
+2026-10-01T21:29:54+02:00 WRITE src/templates/base.html
+2026-10-01T21:29:57+02:00 TESTS green (after src/templates/base.html)

@@ -106,6 +106,17 @@ def test_base_layout_renders_message_tags_as_css_classes(rf):
     assert classes_by_text == {"Goal saved.": {"success"}, "Heads up.": {"note", "info"}}
 
 
+def test_base_layout_messages_container_is_a_status_region(rf):
+    request = request_with_messages(rf)
+    messages.success(request, "Goal saved.")
+
+    html = render_to_string("base.html", request=request)
+
+    section = re.search(r'<section\b[^>]*\bid="messages"[^>]*>', html)
+    assert section
+    assert 'role="status"' in section.group(0)
+
+
 def test_base_layout_omits_messages_container_without_messages(rf):
     request = request_with_messages(rf)
 
