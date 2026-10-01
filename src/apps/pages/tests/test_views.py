@@ -2,3 +2,11 @@ def test_home_page_is_served_to_anonymous_visitors(client):
     response = client.get("/")
 
     assert response.status_code == 200
+
+
+def test_home_page_extends_base_layout(client):
+    response = client.get("/")
+
+    template_names = [template.name for template in response.templates]
+    assert "pages/home.html" in template_names
+    assert "base.html" in template_names
