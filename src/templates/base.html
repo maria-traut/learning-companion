@@ -15,11 +15,13 @@
     </nav>
   </header>
   <main class="container">
-    <section id="messages">
-      {% for message in messages %}
-        <article>{{ message }}</article>
-      {% endfor %}
-    </section>
+    {% if messages %}
+      <section id="messages">
+        {% for message in messages %}
+          <article>{{ message }}</article>
+        {% endfor %}
+      </section>
+    {% endif %}
     {% block content %}{% endblock %}
   </main>
 </body>

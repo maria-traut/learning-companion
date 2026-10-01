@@ -48,3 +48,12 @@ def test_base_layout_renders_messages(rf):
     container = re.search(r'<section id="messages"[^>]*>(.*?)</section>', html, re.DOTALL)
     assert container
     assert "Goal saved." in container.group(1)
+
+
+@pytest.mark.django_db
+def test_base_layout_omits_messages_container_without_messages(rf):
+    request = request_with_messages(rf)
+
+    html = render_to_string("base.html", request=request)
+
+    assert 'id="messages"' not in html
