@@ -11,7 +11,7 @@ the rest alone.
 <!-- Project setup (Django scaffold, pytest, ruff, django-environ) was done outside the pipeline in the initial commit. -->
 
 ## Foundation
-- [~] base-layout: #1 Base layout and home page: `src/templates/base.html` with Pico.css from CDN, a nav bar, and a home page at `/` rendered from it
+- [x] base-layout: #1 Base layout and home page: `src/templates/base.html` with Pico.css from CDN, a nav bar, and a home page at `/` rendered from it — see work/base-layout/review.md
 ## Authentication and profile
 - [ ] #2 Sign up, log in and log out with Django's built-in auth views, using the base layout; nav shows login state (after base layout ships)
 - [ ] #3 Profile model linked one-to-one to the user with `name`, `cohort` and a list of `focus_area` tags, created automatically on sign-up and registered in the admin (after sign up/log in ships)
