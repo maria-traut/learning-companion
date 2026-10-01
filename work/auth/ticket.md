@@ -16,7 +16,7 @@ As a learner, I want to create an account, log in and log out, so that my goals 
 - [ ] AC10 For logged-in users the nav shows their username and a logout button (a POST form with a CSRF token), and no "Log in" or "Sign up" links.
 - [ ] AC11 A logged-in user who opens the login or sign-up page is redirected to the home page.
 - [ ] AC12 `settings.LOGIN_URL` points at the login page, so later `login_required` views (#4 onwards) redirect there.
-- [ ] AC13 Each rendered message carries its level tags (e.g. `success`, `info`) in its markup, and the messages container has `role="status"`. This is deferred finding 6 from `work/base-layout/review.md`.
+- [ ] AC13 Each rendered message includes its `message.tags` value as a CSS class in the message markup, and the messages container has `role="status"` so assistive technologies announce messages. This is deferred finding 6 from `work/base-layout/review.md`; the wording was clarified at plan approval.
 
 ## Out of scope
 - Password reset by email, password change, and email addresses on the account.
