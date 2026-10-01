@@ -19,6 +19,11 @@ def messages_text(response):
     return container.group(1) if container else ""
 
 
+@pytest.fixture
+def user(django_user_model):
+    return django_user_model.objects.create_user(username="ada", password=PASSWORD)
+
+
 def signup_data(username="ada", password1=PASSWORD, password2=PASSWORD):
     return {"username": username, "password1": password1, "password2": password2}
 
@@ -90,3 +95,12 @@ def test_invalid_signup_rerenders_form_with_error_and_creates_no_user(
     assert "registration/signup.html" in template_names(response)
     assert error in response.content.decode()
     assert django_user_model.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_valid_login_redirects_home_and_authenticates(client, user):
+    response = client.post("/accounts/login/", {"username": "ada", "password": PASSWORD})
+
+    assert response.status_code == 302
+    assert response.url == "/"
+    assert client.session["_auth_user_id"] == str(user.pk)
