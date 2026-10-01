@@ -187,3 +187,20 @@ def test_nav_offers_login_and_signup_to_anonymous_visitors(client):
     assert re.search(r'<a href="/accounts/login/"[^>]*>\s*Log in\s*</a>', nav)
     assert re.search(r'<a href="/accounts/signup/"[^>]*>\s*Sign up\s*</a>', nav)
     assert "/accounts/logout/" not in nav
+
+
+@pytest.mark.django_db
+def test_nav_shows_username_and_logout_form_to_logged_in_users(client, user):
+    client.force_login(user)
+
+    nav = nav_html(client.get("/"))
+
+    assert "ada" in nav
+    logout_form = re.search(
+        r'<form method="post" action="/accounts/logout/"[^>]*>(.*?)</form>', nav, re.DOTALL
+    )
+    assert logout_form
+    assert 'name="csrfmiddlewaretoken"' in logout_form.group(1)
+    assert re.search(r"<button[^>]*>\s*Log out\s*</button>", logout_form.group(1))
+    assert "/accounts/login/" not in nav
+    assert "/accounts/signup/" not in nav

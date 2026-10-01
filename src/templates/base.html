@@ -15,8 +15,18 @@
         <li><a href="{% url 'pages:home' %}" class="contrast">Learning Companion</a></li>
       </ul>
       <ul>
-        <li><a href="{% url 'accounts:login' %}">Log in</a></li>
-        <li><a href="{% url 'accounts:signup' %}">Sign up</a></li>
+        {% if user.is_authenticated %}
+          <li>{{ user.get_username }}</li>
+          <li>
+            <form method="post" action="{% url 'accounts:logout' %}">
+              {% csrf_token %}
+              <button type="submit">Log out</button>
+            </form>
+          </li>
+        {% else %}
+          <li><a href="{% url 'accounts:login' %}">Log in</a></li>
+          <li><a href="{% url 'accounts:signup' %}">Sign up</a></li>
+        {% endif %}
       </ul>
     </nav>
   </header>
