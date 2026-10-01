@@ -92,3 +92,7 @@
 2026-10-01T21:27:09+02:00 TESTS red (after src/apps/accounts/tests/test_views.py)
 2026-10-01T21:27:18+02:00 WRITE src/templates/base.html
 2026-10-01T21:27:21+02:00 TESTS green (after src/templates/base.html)
+2026-10-01T21:27:38+02:00 WRITE src/apps/accounts/tests/test_views.py
+2026-10-01T21:27:41+02:00 TESTS red (after src/apps/accounts/tests/test_views.py)
+2026-10-01T21:27:51+02:00 WRITE src/apps/accounts/views.py
+2026-10-01T21:27:53+02:00 TESTS green (after src/apps/accounts/views.py)

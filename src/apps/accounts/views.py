@@ -14,6 +14,8 @@ class SignUpView(SuccessMessageMixin, CreateView):
 
 
 class LoginView(auth_views.LoginView):
+    redirect_authenticated_user = True
+
     def form_valid(self, form):
         response = super().form_valid(form)
         messages.success(self.request, f"Welcome, {form.get_user().get_username()}!")

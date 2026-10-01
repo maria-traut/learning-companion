@@ -204,3 +204,13 @@ def test_nav_shows_username_and_logout_form_to_logged_in_users(client, user):
     assert re.search(r"<button[^>]*>\s*Log out\s*</button>", logout_form.group(1))
     assert "/accounts/login/" not in nav
     assert "/accounts/signup/" not in nav
+
+
+@pytest.mark.django_db
+def test_logged_in_user_is_redirected_home_from_login_page(client, user):
+    client.force_login(user)
+
+    response = client.get("/accounts/login/")
+
+    assert response.status_code == 302
+    assert response.url == "/"
