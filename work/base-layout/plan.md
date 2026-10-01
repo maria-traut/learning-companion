@@ -27,7 +27,7 @@
 - [x] 7. A message added through `django.contrib.messages` appears in the rendered `base.html`. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (messages loop in `#messages`). Covers: AC6.
 - [x] 8. No `#messages` container is rendered when there are no messages. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (guard with `{% if messages %}`). Covers: AC6.
 - [x] 9. `base.html` renders a `<footer>` containing "Learning Companion". Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html`. Covers: AC7.
-- [ ] 10. The home page shows an `<h1>` and welcome text mentioning goals, sessions, resources and AI summaries. Test: `src/apps/pages/tests/test_views.py`. Impl: `src/apps/pages/templates/pages/home.html`. Covers: AC8.
+- [x] 10. The home page shows an `<h1>` and welcome text mentioning goals, sessions, resources and AI summaries. Test: `src/apps/pages/tests/test_views.py`. Impl: `src/apps/pages/templates/pages/home.html`. Covers: AC8.
 
 Every step runs the full suite (`.venv/bin/pytest`) plus `.venv/bin/ruff check .` before committing. The existing smoke tests, system checks included, must stay green throughout. That covers AC9. After step 1 the system-check smoke test also validates the new app registration.
 

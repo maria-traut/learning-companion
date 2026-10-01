@@ -1,3 +1,6 @@
+import re
+
+
 def test_home_page_is_served_to_anonymous_visitors(client):
     response = client.get("/")
 
@@ -16,3 +19,12 @@ def test_home_page_title(client):
     response = client.get("/")
 
     assert "<title>Home · Learning Companion</title>" in response.content.decode()
+
+
+def test_home_page_shows_welcome_heading_and_text(client):
+    response = client.get("/")
+
+    html = response.content.decode()
+    assert re.search(r"<h1>.+</h1>", html)
+    for topic in ("goals", "sessions", "resources", "AI summaries"):
+        assert topic in html
