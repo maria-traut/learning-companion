@@ -19,3 +19,9 @@ def test_base_layout_nav_links_app_name_to_home():
     nav = re.search(r"<nav>(.*?)</nav>", html, re.DOTALL)
     assert nav
     assert re.search(r'<a href="/"[^>]*>\s*Learning Companion\s*</a>', nav.group(1))
+
+
+def test_base_layout_has_default_title():
+    html = render_to_string("base.html")
+
+    assert "<title>Learning Companion</title>" in html
