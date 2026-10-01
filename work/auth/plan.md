@@ -54,7 +54,7 @@
 - [x] 7. A valid login POST redirects to `/` and authenticates the client. Test: `src/apps/accounts/tests/test_views.py`. Impl: `src/config/settings.py` (`LOGIN_REDIRECT_URL`). Covers: AC5.
 - [x] 8. After login, the home page shows "Welcome, <username>" inside `#messages`. Test: `src/apps/accounts/tests/test_views.py`. Impl: `LoginView` subclass `form_valid`. Covers: AC5.
 - [x] 9. *(characterization)* A login POST with `next=/some/safe/path/` redirects there, and `next=https://evil.example.com/` redirects to `/`. Test: `src/apps/accounts/tests/test_views.py`. Impl: none expected. Covers: AC6.
-- [ ] 10. *(characterization)* A login POST with a wrong password returns 200 with the form error, and the client stays anonymous. Test: `src/apps/accounts/tests/test_views.py`. Impl: none expected. Covers: AC7.
+- [x] 10. *(characterization)* A login POST with a wrong password returns 200 with the form error, and the client stays anonymous. Test: `src/apps/accounts/tests/test_views.py`. Impl: none expected. Covers: AC7.
 - [ ] 11. For a logged-in client, `POST /accounts/logout/` logs out and redirects to `/`. Test: `src/apps/accounts/tests/test_views.py`. Impl: `views.py` (`LogoutView` subclass), `urls.py`, `src/config/settings.py` (`LOGOUT_REDIRECT_URL`). Covers: AC8.
 - [ ] 12. After logout, the home page shows "You have been logged out" inside `#messages`. Test: `src/apps/accounts/tests/test_views.py`. Impl: `LogoutView` subclass `post`. Covers: AC8.
 - [ ] 13. *(characterization)* `GET /accounts/logout/` returns 405, and the client stays logged in. Test: `src/apps/accounts/tests/test_views.py`. Impl: none expected. Covers: AC8.

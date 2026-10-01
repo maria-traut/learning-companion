@@ -132,3 +132,13 @@ def test_login_follows_only_safe_next_url(client, user, next_url, expected_redir
 
     assert response.status_code == 302
     assert response.url == expected_redirect
+
+
+@pytest.mark.django_db
+def test_login_with_wrong_password_shows_error_and_stays_anonymous(client, user):
+    response = client.post("/accounts/login/", {"username": "ada", "password": "wrong-password"})
+
+    assert response.status_code == 200
+    assert "registration/login.html" in template_names(response)
+    assert "Please enter a correct username and password" in response.content.decode()
+    assert "_auth_user_id" not in client.session
