@@ -24,7 +24,8 @@ def test_home_page_title(client):
 def test_home_page_shows_welcome_heading_and_text(client):
     response = client.get("/")
 
-    html = response.content.decode()
-    assert re.search(r"<h1>.+</h1>", html)
-    for topic in ("goals", "sessions", "resources", "AI summaries"):
-        assert topic in html
+    main = re.search(r"<main[^>]*>(.*?)</main>", response.content.decode(), re.DOTALL)
+    assert main
+    assert re.search(r"<h1>\s*\S.*?</h1>", main.group(1), re.DOTALL)
+    for topic in ("goals", "sessions", "resources", "AI summaries", "next steps"):
+        assert topic in main.group(1)
