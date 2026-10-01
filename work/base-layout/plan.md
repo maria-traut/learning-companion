@@ -21,7 +21,7 @@
 - [x] 1. Anonymous `GET /` returns 200. Test: `src/apps/pages/tests/test_views.py`. Impl: `startapp pages` into `src/apps/pages/` (`apps.py` name, `INSTALLED_APPS`), `src/apps/pages/urls.py`, `src/apps/pages/views.py` (`HomeView`), `src/config/urls.py` (`include`), `src/apps/pages/templates/pages/home.html` (minimal). Covers: AC1.
 - [x] 2. The home response uses both `pages/home.html` and `base.html`. Test: `src/apps/pages/tests/test_views.py`. Impl: `src/templates/base.html` (skeleton with `content` block), `home.html` extends it. Covers: AC2.
 - [x] 3. `base.html` includes a stylesheet link to a pinned Pico.css CDN version. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html`. Covers: AC3.
-- [ ] 4. `base.html` renders a `<nav>` with a "Learning Companion" link to `/`. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (uses `{% url 'pages:home' %}`). Covers: AC4.
+- [x] 4. `base.html` renders a `<nav>` with a "Learning Companion" link to `/`. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (uses `{% url 'pages:home' %}`). Covers: AC4.
 - [ ] 5. `base.html` renders `<title>Learning Companion</title>` by default. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (`title` block). Covers: AC5.
 - [ ] 6. The home page's title is "Home · Learning Companion". Test: `src/apps/pages/tests/test_views.py`. Impl: `src/apps/pages/templates/pages/home.html` (overrides `title`). Covers: AC5.
 - [ ] 7. A message added through `django.contrib.messages` appears in the rendered `base.html`. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (messages loop in `#messages`). Covers: AC6.

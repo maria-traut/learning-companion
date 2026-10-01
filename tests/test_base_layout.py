@@ -11,3 +11,11 @@ def test_base_layout_links_pinned_pico_css_from_cdn():
         r'css/pico\.min\.css">',
         html,
     )
+
+
+def test_base_layout_nav_links_app_name_to_home():
+    html = render_to_string("base.html")
+
+    nav = re.search(r"<nav>(.*?)</nav>", html, re.DOTALL)
+    assert nav
+    assert re.search(r'<a href="/"[^>]*>\s*Learning Companion\s*</a>', nav.group(1))
