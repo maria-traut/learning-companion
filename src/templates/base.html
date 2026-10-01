@@ -34,7 +34,7 @@
     {% if messages %}
       <section id="messages">
         {% for message in messages %}
-          <article>{{ message }}</article>
+          <article class="{{ message.tags }}">{{ message }}</article>
         {% endfor %}
       </section>
     {% endif %}

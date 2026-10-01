@@ -100,3 +100,13 @@
 2026-10-01T21:28:09+02:00 TESTS red (after src/apps/accounts/tests/test_views.py)
 2026-10-01T21:28:24+02:00 WRITE src/apps/accounts/views.py
 2026-10-01T21:28:27+02:00 TESTS green (after src/apps/accounts/views.py)
+2026-10-01T21:28:50+02:00 WRITE tests/test_base_layout.py
+2026-10-01T21:28:53+02:00 TESTS green (after tests/test_base_layout.py)
+2026-10-01T21:28:53+02:00 WRITE tests/test_base_layout.py
+2026-10-01T21:28:56+02:00 TESTS green (after tests/test_base_layout.py)
+2026-10-01T21:28:56+02:00 WRITE tests/test_base_layout.py
+2026-10-01T21:28:59+02:00 TESTS green (after tests/test_base_layout.py)
+2026-10-01T21:29:10+02:00 WRITE tests/test_base_layout.py
+2026-10-01T21:29:13+02:00 TESTS red (after tests/test_base_layout.py)
+2026-10-01T21:29:25+02:00 WRITE src/templates/base.html
+2026-10-01T21:29:28+02:00 TESTS green (after src/templates/base.html)

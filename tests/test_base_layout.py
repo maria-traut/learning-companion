@@ -39,6 +39,12 @@ def pico_link_tag(html):
     return links[0]
 
 
+def messages_container(html):
+    container = re.search(r'<section id="messages"[^>]*>(.*?)</section>', html, re.DOTALL)
+    assert container
+    return container.group(1)
+
+
 def test_base_layout_links_pinned_pico_css_from_cdn():
     html = render_to_string("base.html")
 
@@ -73,9 +79,7 @@ def test_base_layout_renders_messages(rf):
 
     html = render_to_string("base.html", request=request)
 
-    container = re.search(r'<section id="messages"[^>]*>(.*?)</section>', html, re.DOTALL)
-    assert container
-    assert "Goal saved." in container.group(1)
+    assert "Goal saved." in messages_container(html)
 
 
 @pytest.mark.urls(__name__)
@@ -83,11 +87,23 @@ def test_message_added_in_one_request_appears_on_next_page(client):
     response = client.get("/add-message/", follow=True)
 
     assert response.redirect_chain == [("/", 302)]
-    container = re.search(
-        r'<section id="messages"[^>]*>(.*?)</section>', response.content.decode(), re.DOTALL
+    assert "Goal saved." in messages_container(response.content.decode())
+
+
+def test_base_layout_renders_message_tags_as_css_classes(rf):
+    request = request_with_messages(rf)
+    messages.success(request, "Goal saved.")
+    messages.info(request, "Heads up.", extra_tags="note")
+
+    html = render_to_string("base.html", request=request)
+
+    articles = re.findall(
+        r'<article\b[^>]*\bclass="([^"]*)"[^>]*>\s*(.*?)\s*</article>',
+        messages_container(html),
+        re.DOTALL,
     )
-    assert container
-    assert "Goal saved." in container.group(1)
+    classes_by_text = {text: set(classes.split()) for classes, text in articles}
+    assert classes_by_text == {"Goal saved.": {"success"}, "Heads up.": {"note", "info"}}
 
 
 def test_base_layout_omits_messages_container_without_messages(rf):
