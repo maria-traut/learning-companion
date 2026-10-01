@@ -57,3 +57,11 @@ def test_base_layout_omits_messages_container_without_messages(rf):
     html = render_to_string("base.html", request=request)
 
     assert 'id="messages"' not in html
+
+
+def test_base_layout_has_footer_with_app_name():
+    html = render_to_string("base.html")
+
+    footer = re.search(r"<footer[^>]*>(.*?)</footer>", html, re.DOTALL)
+    assert footer
+    assert "Learning Companion" in footer.group(1)
