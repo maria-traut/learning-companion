@@ -153,3 +153,13 @@ def test_logout_via_post_logs_out_and_redirects_home(client, user):
     assert response.status_code == 302
     assert response.url == "/"
     assert "_auth_user_id" not in client.session
+
+
+@pytest.mark.django_db
+def test_logout_shows_logged_out_message_on_home_page(client, user):
+    client.force_login(user)
+
+    response = client.post("/accounts/logout/", follow=True)
+
+    assert response.redirect_chain == [("/", 302)]
+    assert "You have been logged out" in messages_text(response)

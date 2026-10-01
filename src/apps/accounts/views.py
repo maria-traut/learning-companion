@@ -18,3 +18,10 @@ class LoginView(auth_views.LoginView):
         response = super().form_valid(form)
         messages.success(self.request, f"Welcome, {form.get_user().get_username()}!")
         return response
+
+
+class LogoutView(auth_views.LogoutView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        messages.info(request, "You have been logged out.")
+        return response
