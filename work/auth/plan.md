@@ -57,7 +57,7 @@
 - [x] 10. *(characterization)* A login POST with a wrong password returns 200 with the form error, and the client stays anonymous. Test: `src/apps/accounts/tests/test_views.py`. Impl: none expected. Covers: AC7.
 - [x] 11. For a logged-in client, `POST /accounts/logout/` logs out and redirects to `/`. Test: `src/apps/accounts/tests/test_views.py`. Impl: `views.py` (`LogoutView` subclass), `urls.py`, `src/config/settings.py` (`LOGOUT_REDIRECT_URL`). Covers: AC8.
 - [x] 12. After logout, the home page shows "You have been logged out" inside `#messages`. Test: `src/apps/accounts/tests/test_views.py`. Impl: `LogoutView` subclass `post`. Covers: AC8.
-- [ ] 13. *(characterization)* `GET /accounts/logout/` returns 405, and the client stays logged in. Test: `src/apps/accounts/tests/test_views.py`. Impl: none expected. Covers: AC8.
+- [x] 13. *(characterization)* `GET /accounts/logout/` returns 405, and the client stays logged in. Test: `src/apps/accounts/tests/test_views.py`. Impl: none expected. Covers: AC8.
 - [ ] 14. For an anonymous visitor, the `<nav>` on `/` has links to `/accounts/login/` ("Log in") and `/accounts/signup/` ("Sign up") and no logout form. Test: `src/apps/accounts/tests/test_views.py`. Impl: `src/templates/base.html`. Covers: AC9.
 - [ ] 15. For a logged-in user, the `<nav>` on `/` shows the username and a `<form method="post" action="/accounts/logout/">` containing a `csrfmiddlewaretoken` input and a "Log out" button, and has no login or sign-up links. Test: `src/apps/accounts/tests/test_views.py`. Impl: `src/templates/base.html`. Covers: AC10.
 - [ ] 16. A logged-in `GET /accounts/login/` redirects to `/`. Test: `src/apps/accounts/tests/test_views.py`. Impl: `LoginView` subclass (`redirect_authenticated_user = True`). Covers: AC11.
