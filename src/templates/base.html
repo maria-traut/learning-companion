@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Learning Companion{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css"
+        integrity="sha384-L1dWfspMTHU/ApYnFiMz2QID/PlP1xCW9visvBdbEkOLkSSWsP6ZJWhPw6apiXxU"
+        crossorigin="anonymous">
+</head>
+<body>
+  <header class="container">
+    <nav>
+      <ul>
+        <li><a href="{% url 'pages:home' %}" class="contrast">Learning Companion</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main class="container">
+    {% if messages %}
+      <section id="messages">
+        {% for message in messages %}
+          <article>{{ message }}</article>
+        {% endfor %}
+      </section>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="container">
+    <small>Learning Companion</small>
+  </footer>
+</body>
+</html>
