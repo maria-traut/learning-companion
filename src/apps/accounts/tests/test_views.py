@@ -24,6 +24,12 @@ def user(django_user_model):
     return django_user_model.objects.create_user(username="ada", password=PASSWORD)
 
 
+def nav_html(response):
+    nav = re.search(r"<nav[^>]*>(.*?)</nav>", response.content.decode(), re.DOTALL)
+    assert nav
+    return nav.group(1)
+
+
 def signup_data(username="ada", password1=PASSWORD, password2=PASSWORD):
     return {"username": username, "password1": password1, "password2": password2}
 
@@ -173,3 +179,11 @@ def test_logout_via_get_is_not_allowed_and_keeps_user_logged_in(client, user):
 
     assert response.status_code == 405
     assert client.session["_auth_user_id"] == str(user.pk)
+
+
+def test_nav_offers_login_and_signup_to_anonymous_visitors(client):
+    nav = nav_html(client.get("/"))
+
+    assert re.search(r'<a href="/accounts/login/"[^>]*>\s*Log in\s*</a>', nav)
+    assert re.search(r'<a href="/accounts/signup/"[^>]*>\s*Sign up\s*</a>', nav)
+    assert "/accounts/logout/" not in nav

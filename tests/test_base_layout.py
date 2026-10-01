@@ -16,6 +16,7 @@ def add_message_and_redirect_home(request):
 
 urlpatterns = [
     path("add-message/", add_message_and_redirect_home),
+    path("accounts/", include("apps.accounts.urls")),
     path("", include("apps.pages.urls")),
 ]
 
