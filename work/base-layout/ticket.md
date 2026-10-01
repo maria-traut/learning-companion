@@ -4,15 +4,15 @@
 As a visitor, I want a consistently styled home page at `/` with a nav bar, so that I know what Learning Companion is and every later page shares the same layout.
 
 ## Acceptance criteria
-- [ ] AC1 `GET /` returns 200 for an anonymous visitor (no login required).
-- [ ] AC2 The home page is rendered from `src/templates/base.html`, i.e. the response uses both `base.html` and the home page template that extends it.
-- [ ] AC3 `base.html` loads Pico.css from a CDN via a `<link rel="stylesheet">` pointing at a pinned Pico.css version.
-- [ ] AC4 `base.html` renders a `<nav>` containing the app name "Learning Companion" as a link to `/`.
-- [ ] AC5 `base.html` defines an overridable `title` block; the home page's `<title>` is "Home · Learning Companion", and a page that does not override it gets "Learning Companion".
-- [ ] AC6 `base.html` renders Django messages: a message added via `django.contrib.messages` appears in the next rendered page, and no messages container is rendered when there are none.
-- [ ] AC7 `base.html` renders a `<footer>` containing the app name.
-- [ ] AC8 The home page shows a heading and a short welcome text describing what Learning Companion does (tracking learning goals and sessions, attaching resources, AI summaries and next steps).
-- [ ] AC9 The existing smoke tests (system checks, admin login) still pass.
+- [x] AC1 `GET /` returns 200 for an anonymous visitor (no login required).
+- [x] AC2 The home page is rendered from `src/templates/base.html`, i.e. the response uses both `base.html` and the home page template that extends it.
+- [x] AC3 `base.html` loads Pico.css from a CDN via a `<link rel="stylesheet">` pointing at a pinned Pico.css version.
+- [x] AC4 `base.html` renders a `<nav>` containing the app name "Learning Companion" as a link to `/`.
+- [x] AC5 `base.html` defines an overridable `title` block; the home page's `<title>` is "Home · Learning Companion", and a page that does not override it gets "Learning Companion".
+- [x] AC6 `base.html` renders Django messages: a message added via `django.contrib.messages` appears in the next rendered page, and no messages container is rendered when there are none.
+- [x] AC7 `base.html` renders a `<footer>` containing the app name.
+- [x] AC8 The home page shows a heading and a short welcome text describing what Learning Companion does (tracking learning goals and sessions, attaching resources, AI summaries and next steps).
+- [x] AC9 The existing smoke tests (system checks, admin login) still pass.
 
 ## Out of scope
 - Login/logout/sign-up links and login state in the nav (#2).
