@@ -67,3 +67,26 @@ def test_signup_shows_account_created_message_on_login_page(client):
 
     assert response.redirect_chain == [("/accounts/login/", 302)]
     assert "Account created" in messages_text(response)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("data", "error"),
+    [
+        (signup_data(username="grace", password2="something-else-entirely-7"), "didn’t match"),
+        (signup_data(username="ADA"), "A user with that username already exists."),
+        (signup_data(username="grace", password1="12345678", password2="12345678"), "too common"),
+    ],
+    ids=["mismatched-passwords", "username-taken", "weak-password"],
+)
+def test_invalid_signup_rerenders_form_with_error_and_creates_no_user(
+    client, django_user_model, data, error
+):
+    django_user_model.objects.create_user(username="ada", password=PASSWORD)
+
+    response = client.post("/accounts/signup/", data)
+
+    assert response.status_code == 200
+    assert "registration/signup.html" in template_names(response)
+    assert error in response.content.decode()
+    assert django_user_model.objects.count() == 1
