@@ -114,3 +114,21 @@ def test_login_shows_welcome_message(client, user):
 
     assert response.redirect_chain == [("/", 302)]
     assert "Welcome, ada" in messages_text(response)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("next_url", "expected_redirect"),
+    [
+        ("/some/safe/path/", "/some/safe/path/"),
+        ("https://evil.example.com/", "/"),
+    ],
+    ids=["same-site", "external"],
+)
+def test_login_follows_only_safe_next_url(client, user, next_url, expected_redirect):
+    response = client.post(
+        f"/accounts/login/?next={next_url}", {"username": "ada", "password": PASSWORD}
+    )
+
+    assert response.status_code == 302
+    assert response.url == expected_redirect

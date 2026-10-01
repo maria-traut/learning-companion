@@ -60,3 +60,5 @@
 2026-10-01T21:23:27+02:00 TESTS red (after src/apps/accounts/views.py)
 2026-10-01T21:23:27+02:00 WRITE src/apps/accounts/urls.py
 2026-10-01T21:23:29+02:00 TESTS green (after src/apps/accounts/urls.py)
+2026-10-01T21:23:41+02:00 WRITE src/apps/accounts/tests/test_views.py
+2026-10-01T21:23:43+02:00 TESTS green (after src/apps/accounts/tests/test_views.py)
