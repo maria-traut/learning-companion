@@ -27,14 +27,21 @@ def request_with_messages(rf):
     return request
 
 
+PICO_HREF = re.compile(
+    r'href="https://cdn\.jsdelivr\.net/npm/@picocss/pico@\d+\.\d+\.\d+/css/pico\.min\.css"'
+)
+
+
+def pico_link_tag(html):
+    links = [tag for tag in re.findall(r"<link\b[^>]*>", html) if PICO_HREF.search(tag)]
+    assert len(links) == 1
+    return links[0]
+
+
 def test_base_layout_links_pinned_pico_css_from_cdn():
     html = render_to_string("base.html")
 
-    assert re.search(
-        r'<link rel="stylesheet" href="https://cdn\.jsdelivr\.net/npm/@picocss/pico@\d+\.\d+\.\d+/'
-        r'css/pico\.min\.css">',
-        html,
-    )
+    assert 'rel="stylesheet"' in pico_link_tag(html)
 
 
 def test_base_layout_nav_links_app_name_to_home():
