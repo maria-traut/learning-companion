@@ -1,6 +1,17 @@
 import re
 
+import pytest
+from django.contrib import messages
+from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.template.loader import render_to_string
+
+
+def request_with_messages(rf):
+    request = rf.get("/")
+    SessionMiddleware(lambda request: None).process_request(request)
+    MessageMiddleware(lambda request: None).process_request(request)
+    return request
 
 
 def test_base_layout_links_pinned_pico_css_from_cdn():
@@ -25,3 +36,15 @@ def test_base_layout_has_default_title():
     html = render_to_string("base.html")
 
     assert "<title>Learning Companion</title>" in html
+
+
+@pytest.mark.django_db
+def test_base_layout_renders_messages(rf):
+    request = request_with_messages(rf)
+    messages.success(request, "Goal saved.")
+
+    html = render_to_string("base.html", request=request)
+
+    container = re.search(r'<section id="messages"[^>]*>(.*?)</section>', html, re.DOTALL)
+    assert container
+    assert "Goal saved." in container.group(1)

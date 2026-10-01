@@ -24,7 +24,7 @@
 - [x] 4. `base.html` renders a `<nav>` with a "Learning Companion" link to `/`. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (uses `{% url 'pages:home' %}`). Covers: AC4.
 - [x] 5. `base.html` renders `<title>Learning Companion</title>` by default. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (`title` block). Covers: AC5.
 - [x] 6. The home page's title is "Home · Learning Companion". Test: `src/apps/pages/tests/test_views.py`. Impl: `src/apps/pages/templates/pages/home.html` (overrides `title`). Covers: AC5.
-- [ ] 7. A message added through `django.contrib.messages` appears in the rendered `base.html`. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (messages loop in `#messages`). Covers: AC6.
+- [x] 7. A message added through `django.contrib.messages` appears in the rendered `base.html`. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (messages loop in `#messages`). Covers: AC6.
 - [ ] 8. No `#messages` container is rendered when there are no messages. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html` (guard with `{% if messages %}`). Covers: AC6.
 - [ ] 9. `base.html` renders a `<footer>` containing "Learning Companion". Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html`. Covers: AC7.
 - [ ] 10. The home page shows an `<h1>` and welcome text mentioning goals, sessions, resources and AI summaries. Test: `src/apps/pages/tests/test_views.py`. Impl: `src/apps/pages/templates/pages/home.html`. Covers: AC8.
