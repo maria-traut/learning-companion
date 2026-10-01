@@ -4,19 +4,19 @@
 As a learner, I want to create an account, log in and log out, so that my goals and sessions can be kept private to me.
 
 ## Acceptance criteria
-- [ ] AC1 An anonymous visitor gets a sign-up page (200, rendered through `base.html`) with a form for username, password and password confirmation.
-- [ ] AC2 A valid sign-up creates the user, does **not** log them in, redirects to the login page, and shows a success message ("Account created" or similar) there.
-- [ ] AC3 An invalid sign-up (mismatched passwords, a username that is already taken, or a password the configured validators reject) re-renders the form with errors and creates no user.
-- [ ] AC4 An anonymous visitor gets a login page (200, rendered through `base.html`) with a username/password form.
-- [ ] AC5 A valid login authenticates the user, redirects to the home page, and shows a "Welcome, <username>" message.
-- [ ] AC6 After login a safe, same-site `?next=` URL is honoured, and an external `?next=` URL is ignored in favour of the home page.
-- [ ] AC7 Invalid credentials re-render the login form with an error, and the user stays anonymous.
-- [ ] AC8 Logout via POST logs the user out, redirects to the home page, and shows a "You have been logged out" message. Logout via GET doesn't log the user out (Django returns 405).
-- [ ] AC9 For anonymous visitors the nav shows "Log in" and "Sign up" links and no logout control.
-- [ ] AC10 For logged-in users the nav shows their username and a logout button (a POST form with a CSRF token), and no "Log in" or "Sign up" links.
-- [ ] AC11 A logged-in user who opens the login or sign-up page is redirected to the home page.
-- [ ] AC12 `settings.LOGIN_URL` points at the login page, so later `login_required` views (#4 onwards) redirect there.
-- [ ] AC13 Each rendered message includes its `message.tags` value as a CSS class in the message markup, and the messages container has `role="status"` so assistive technologies announce messages. This is deferred finding 6 from `work/base-layout/review.md`; the wording was clarified at plan approval.
+- [x] AC1 An anonymous visitor gets a sign-up page (200, rendered through `base.html`) with a form for username, password and password confirmation.
+- [x] AC2 A valid sign-up creates the user, does **not** log them in, redirects to the login page, and shows a success message ("Account created" or similar) there.
+- [x] AC3 An invalid sign-up (mismatched passwords, a username that is already taken, or a password the configured validators reject) re-renders the form with errors and creates no user.
+- [x] AC4 An anonymous visitor gets a login page (200, rendered through `base.html`) with a username/password form.
+- [x] AC5 A valid login authenticates the user, redirects to the home page, and shows a "Welcome, <username>" message.
+- [x] AC6 After login a safe, same-site `?next=` URL is honoured, and an external `?next=` URL is ignored in favour of the home page.
+- [x] AC7 Invalid credentials re-render the login form with an error, and the user stays anonymous.
+- [x] AC8 Logout via POST logs the user out, redirects to the home page, and shows a "You have been logged out" message. Logout via GET doesn't log the user out (Django returns 405).
+- [x] AC9 For anonymous visitors the nav shows "Log in" and "Sign up" links and no logout control.
+- [x] AC10 For logged-in users the nav shows their username and a logout button (a POST form with a CSRF token), and no "Log in" or "Sign up" links.
+- [x] AC11 A logged-in user who opens the login or sign-up page is redirected to the home page.
+- [x] AC12 `settings.LOGIN_URL` points at the login page, so later `login_required` views (#4 onwards) redirect there.
+- [x] AC13 Each rendered message includes its `message.tags` value as a CSS class in the message markup, and the messages container has `role="status"` so assistive technologies announce messages. This is deferred finding 6 from `work/base-layout/review.md`; the wording was clarified at plan approval.
 
 ## Out of scope
 - Password reset by email, password change, and email addresses on the account.
