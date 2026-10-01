@@ -12,6 +12,13 @@ def template_names(response):
     return [template.name for template in response.templates]
 
 
+def messages_text(response):
+    container = re.search(
+        r'<section id="messages"[^>]*>(.*?)</section>', response.content.decode(), re.DOTALL
+    )
+    return container.group(1) if container else ""
+
+
 def signup_data(username="ada", password1=PASSWORD, password2=PASSWORD):
     return {"username": username, "password1": password1, "password2": password2}
 
@@ -52,3 +59,11 @@ def test_valid_signup_creates_user_and_redirects_to_login_without_logging_in(
     assert response.url == "/accounts/login/"
     assert django_user_model.objects.filter(username="ada").exists()
     assert "_auth_user_id" not in client.session
+
+
+@pytest.mark.django_db
+def test_signup_shows_account_created_message_on_login_page(client):
+    response = client.post("/accounts/signup/", signup_data(), follow=True)
+
+    assert response.redirect_chain == [("/accounts/login/", 302)]
+    assert "Account created" in messages_text(response)
