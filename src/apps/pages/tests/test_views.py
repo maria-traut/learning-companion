@@ -10,3 +10,9 @@ def test_home_page_extends_base_layout(client):
     template_names = [template.name for template in response.templates]
     assert "pages/home.html" in template_names
     assert "base.html" in template_names
+
+
+def test_home_page_title(client):
+    response = client.get("/")
+
+    assert "<title>Home · Learning Companion</title>" in response.content.decode()
