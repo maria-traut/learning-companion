@@ -214,3 +214,13 @@ def test_logged_in_user_is_redirected_home_from_login_page(client, user):
 
     assert response.status_code == 302
     assert response.url == "/"
+
+
+@pytest.mark.django_db
+def test_logged_in_user_is_redirected_home_from_signup_page(client, user):
+    client.force_login(user)
+
+    response = client.get("/accounts/signup/")
+
+    assert response.status_code == 302
+    assert response.url == "/"

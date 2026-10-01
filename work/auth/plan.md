@@ -61,7 +61,7 @@
 - [x] 14. For an anonymous visitor, the `<nav>` on `/` has links to `/accounts/login/` ("Log in") and `/accounts/signup/` ("Sign up") and no logout form. Test: `src/apps/accounts/tests/test_views.py`. Impl: `src/templates/base.html`. Covers: AC9.
 - [x] 15. For a logged-in user, the `<nav>` on `/` shows the username and a `<form method="post" action="/accounts/logout/">` containing a `csrfmiddlewaretoken` input and a "Log out" button, and has no login or sign-up links. Test: `src/apps/accounts/tests/test_views.py`. Impl: `src/templates/base.html`. Covers: AC10.
 - [x] 16. A logged-in `GET /accounts/login/` redirects to `/`. Test: `src/apps/accounts/tests/test_views.py`. Impl: `LoginView` subclass (`redirect_authenticated_user = True`). Covers: AC11.
-- [ ] 17. A logged-in `GET /accounts/signup/` redirects to `/`. Test: `src/apps/accounts/tests/test_views.py`. Impl: `SignUpView.dispatch`. Covers: AC11.
+- [x] 17. A logged-in `GET /accounts/signup/` redirects to `/`. Test: `src/apps/accounts/tests/test_views.py`. Impl: `SignUpView.dispatch`. Covers: AC11.
 - [ ] 18. Each rendered message `<article>` includes its `message.tags` value as a CSS class: `success` for `messages.success`, `info` for `messages.info`, and an `extra_tags` value is included too (e.g. `messages.info(..., extra_tags="note")` gives both `note` and `info` in the class list). Test: `tests/test_base_layout.py`. Refactor first, on green: extract a `messages_container(html)` helper for the duplicated `#messages` regex (base-layout review finding 2). Impl: `src/templates/base.html`. Covers: AC13.
 - [ ] 19. The `#messages` container has `role="status"`, so assistive technologies announce messages. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html`. Covers: AC13.
 
