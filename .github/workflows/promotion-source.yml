@@ -1,0 +1,25 @@
+name: promotion-source
+
+# main only receives promotion PRs from develop (see .claude/rules/git.md).
+# The job below is a required status check in the main branch ruleset.
+on:
+  pull_request:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  require-develop-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR into main must come from develop
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          BASE_REPO: ${{ github.repository }}
+        run: |
+          if [ "$HEAD_REF" != "develop" ] || [ "$HEAD_REPO" != "$BASE_REPO" ]; then
+            echo "::error::PRs into main must come from develop in this repository (got $HEAD_REPO:$HEAD_REF)."
+            exit 1
+          fi
+          echo "Promotion from develop: OK"

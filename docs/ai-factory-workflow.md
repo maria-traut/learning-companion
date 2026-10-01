@@ -8,7 +8,7 @@ Three mechanisms, three responsibilities:
 
 - **Skills** own the phases. Each phase is a skill (`refine-ticket`, `plan-ticket`, `tdd-implement`, `final-review`) that consumes the previous phase's artifact, produces its own, and performs the state transition. Skills are the only place the workflow state changes.
 - **Rules** own the discipline. `.claude/rules/` states what always applies — phase order, red–green–refactor, git conventions — so the model behaves correctly even between skill invocations.
-- **Hooks** own enforcement. Rules and skills are instructions; a model can drift from instructions. Hooks are shell scripts, so the gates hold deterministically: no source edits outside the implementing phase, no commits on red or on `main`, no push before the review passed, no ending the session mid-cycle on a red suite.
+- **Hooks** own enforcement. Rules and skills are instructions; a model can drift from instructions. Hooks are shell scripts, so the gates hold deterministically: no source edits outside the implementing phase, no commits on red, on `main`, or on `develop` (except the main→develop sync merge), no direct push to `main`, no push or PR merge before the review passed, no ending the session mid-cycle on a red suite.
 
 Sub-agents appear in two places, mirroring the factory patterns: `plan-ticket` fans research out across parallel `Explore` agents (pipeline stage 1), and `final-review` runs two read-only reviewer agents with different lenses (verification gate).
 
@@ -47,7 +47,8 @@ Blocked calls exit with code 2; the stderr message tells Claude which phase it i
 
 ```
 > use refine-ticket: users should be able to comment on posts
-  → interview, work/comments-endpoint/ticket.md, branch feat/comments-endpoint, phase refined
+  → interview, work/comments-endpoint/ticket.md, branch feature/comments-endpoint from develop,
+    backlog [~] + board "In Progress", phase refined
 > use plan-ticket
   → 3 Explore agents research patterns/tests/data layer in parallel
   → work/comments-endpoint/plan.md with one TDD step per acceptance criterion, phase planned
@@ -56,7 +57,10 @@ Blocked calls exit with code 2; the stderr message tells Claude which phase it i
   → phase reviewing when the last step is ticked
 > use final-review
   → code-reviewer + security-reviewer agents in parallel, AC check, review.md
-  → PASS: phase done, push, gh pr create   |   FAIL: findings become plan steps, back to tdd-implement
+  → PASS: phase done, push, PR into develop   |   FAIL: findings become plan steps, back to tdd-implement
+> use release-ticket
+  → squash-merge PR into develop, merge main into develop, promotion PR develop → main (merge commit)
+  → backlog [x], issue closed, board "Done", phase released
 ```
 
 Try to misbehave and the hooks answer: editing `src/` in phase `refined` is blocked, `git commit` with a failing test is blocked, `git push` before the review is blocked.
@@ -83,11 +87,12 @@ Each invocation advances the pipeline by exactly one step and then stops:
 
 | phase | action |
 |---|---|
-| `idle` / `done` | close out the finished ticket (if any), switch back to `main`, pick the next `[ ]` backlog line, trigger `refine-ticket` |
+| `idle` / `released` | confirm the previous ticket landed on `main`, switch to an up-to-date `develop`, pick the next `[ ]` backlog line, trigger `refine-ticket` |
 | `refined` | trigger `plan-ticket` |
 | `planned` | trigger `tdd-implement` |
 | `implementing` | trigger `tdd-implement` (resumes) |
 | `reviewing` | trigger `final-review` |
+| `done` | trigger `release-ticket` |
 
 ### Running it in a loop
 

@@ -1,6 +1,10 @@
 # Learning Companion
 
-Django app for tracking learning goals and sessions, attaching resources, and generating AI summaries/next steps. Requirements: `instructions/challenge.md`. Development follows the pipeline in `.claude/rules/` (workflow, TDD, git); the ticket queue is `work/backlog.md`.
+Django app for tracking learning goals and sessions, attaching resources, and generating AI summaries/next steps. Requirements: `instructions/challenge.md`. Development follows the pipeline in `.claude/rules/` (workflow, TDD, git); the ticket queue is `work/backlog.md`, mirrored to GitHub issues and the project board (https://github.com/users/maria-traut/projects/5).
+
+## Gitflow
+
+`feature/<id>` / `fix/<id>` branch from `develop` → squash-merged PR into `develop` → `main` merged into `develop` (`chore(release): merge main into develop`) → promotion PR `develop` → `main` (merge commit). `main` and `develop` never take direct commits. Details: `.claude/rules/git.md`. Pipeline: `refine-ticket` → `plan-ticket` → `tdd-implement` → `final-review` → `release-ticket`, driven by `factory-manager`.
 
 ## Commands
 
