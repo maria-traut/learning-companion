@@ -4,7 +4,20 @@ import pytest
 from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
+from django.urls import include, path
+
+
+def add_message_and_redirect_home(request):
+    messages.success(request, "Goal saved.")
+    return redirect("pages:home")
+
+
+urlpatterns = [
+    path("add-message/", add_message_and_redirect_home),
+    path("", include("apps.pages.urls")),
+]
 
 
 def request_with_messages(rf):
@@ -46,6 +59,18 @@ def test_base_layout_renders_messages(rf):
     html = render_to_string("base.html", request=request)
 
     container = re.search(r'<section id="messages"[^>]*>(.*?)</section>', html, re.DOTALL)
+    assert container
+    assert "Goal saved." in container.group(1)
+
+
+@pytest.mark.urls(__name__)
+def test_message_added_in_one_request_appears_on_next_page(client):
+    response = client.get("/add-message/", follow=True)
+
+    assert response.redirect_chain == [("/", 302)]
+    container = re.search(
+        r'<section id="messages"[^>]*>(.*?)</section>', response.content.decode(), re.DOTALL
+    )
     assert container
     assert "Goal saved." in container.group(1)
 
