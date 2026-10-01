@@ -51,6 +51,6 @@ Steps 11, 12, 13 and 15 only tighten tests that are already wrong or too weak (`
 - [x] 12. The home welcome assertions are scoped to `<main>`: a non-empty `<h1>`, plus goals, sessions, resources, AI summaries and next steps. Test: `src/apps/pages/tests/test_views.py` (replace the existing AC8 test). Impl: none expected. Covers: AC8 (finding 2).
 - [x] 13. The Pico test finds the stylesheet `<link>` tag first, then asserts `rel="stylesheet"` and the pinned jsDelivr `href` separately, so attribute order doesn't matter. Test: `tests/test_base_layout.py` (replace the existing AC3 test). Impl: none expected. Covers: AC3 (finding 3).
 - [x] 14. The Pico `<link>` carries a `sha384-` `integrity` attribute and `crossorigin="anonymous"`. Test: `tests/test_base_layout.py`. Impl: `src/templates/base.html`, using the real sha384 of pico 2.1.1 `pico.min.css`. Covers: AC3 (finding 4).
-- [ ] 15. Remove the unneeded `@pytest.mark.django_db` from the message tests. Test: `tests/test_base_layout.py`. Impl: none. Covers: — (finding 5). Skip this step if step 11's client-based test needs DB access; the in-request tests still don't.
+- [x] 15. Remove the unneeded `@pytest.mark.django_db` from the message tests. Test: `tests/test_base_layout.py`. Impl: none. Covers: — (finding 5). Skip this step if step 11's client-based test needs DB access; the in-request tests still don't.
 
 Deferred, not planned: finding 6 (message tags / `role="status"`, goes with #2) and finding 7 (repo-wide quote style).

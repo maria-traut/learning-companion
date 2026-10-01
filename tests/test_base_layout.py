@@ -66,7 +66,6 @@ def test_base_layout_has_default_title():
     assert "<title>Learning Companion</title>" in html
 
 
-@pytest.mark.django_db
 def test_base_layout_renders_messages(rf):
     request = request_with_messages(rf)
     messages.success(request, "Goal saved.")
@@ -90,7 +89,6 @@ def test_message_added_in_one_request_appears_on_next_page(client):
     assert "Goal saved." in container.group(1)
 
 
-@pytest.mark.django_db
 def test_base_layout_omits_messages_container_without_messages(rf):
     request = request_with_messages(rf)
 
