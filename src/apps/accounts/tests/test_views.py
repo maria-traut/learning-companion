@@ -142,3 +142,14 @@ def test_login_with_wrong_password_shows_error_and_stays_anonymous(client, user)
     assert "registration/login.html" in template_names(response)
     assert "Please enter a correct username and password" in response.content.decode()
     assert "_auth_user_id" not in client.session
+
+
+@pytest.mark.django_db
+def test_logout_via_post_logs_out_and_redirects_home(client, user):
+    client.force_login(user)
+
+    response = client.post("/accounts/logout/")
+
+    assert response.status_code == 302
+    assert response.url == "/"
+    assert "_auth_user_id" not in client.session
