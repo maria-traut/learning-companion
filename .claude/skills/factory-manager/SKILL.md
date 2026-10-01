@@ -1,11 +1,13 @@
 ---
 name: factory-manager
-description: Inspects the ticket backlog and the current workflow phase, then triggers the one pipeline skill (refine-ticket, plan-ticket, tdd-implement, or final-review) that owns the next step. Picks the next queued ticket when idle or done. Advances the pipeline by exactly one step per call and reports cleanly, so it is safe to invoke repeatedly, including from a loop. Use when the user wants the AI factory to keep moving without manually tracking phase and ticket state themselves.
+description: Inspects the ticket backlog and the current workflow phase, then triggers the one pipeline skill (refine-ticket, plan-ticket, tdd-implement, final-review, or release-ticket) that owns the next step. Picks the next queued ticket once the previous one has landed on main (phase released) or nothing is in progress (idle). Advances the pipeline by exactly one step per call and reports cleanly, so it is safe to invoke repeatedly, including from a loop. Use when the user wants the AI factory to keep moving without manually tracking phase and ticket state themselves.
 ---
 
 # Manage the AI factory
 
-Orchestrates the pipeline defined in `.claude/rules/workflow.md`. This skill never changes `phase` itself, never writes source code, and never invokes more than one phase skill per call — it only reads state, decides which phase skill owns the next step, and triggers it with the `Skill` tool. All actual work and every phase transition still happens inside `refine-ticket`, `plan-ticket`, `tdd-implement`, and `final-review`.
+Orchestrates the pipeline defined in `.claude/rules/workflow.md`. This skill never changes `phase` itself, never writes source code, and never invokes more than one phase skill per call — it only reads state, decides which phase skill owns the next step, and triggers it with the `Skill` tool. All actual work and every phase transition still happens inside `refine-ticket`, `plan-ticket`, `tdd-implement`, `final-review`, and `release-ticket`.
+
+Status sync is owned by the transition skills, so backlog, GitHub issue and project board always move together: `refine-ticket` sets `[~]` + board "In Progress", `release-ticket` sets `[x]` + board "Done" + closes the issue once the ticket is on `main`. Backlog lines reference their issue as `#<n>`.
 
 ## Preconditions
 
@@ -16,9 +18,10 @@ Orchestrates the pipeline defined in `.claude/rules/workflow.md`. This skill nev
    # Ticket backlog
 
    Queue for `factory-manager`. One idea per line, top to bottom = priority order.
-   `factory-manager` owns the status marker, the ticket id, and the `[[parked: ...]]`
-   annotation on each line — add new ideas as plain `- [ ] <description>` lines and
-   leave the rest alone.
+   The pipeline skills own the status marker, the ticket id, and the `[[parked: ...]]`
+   annotation on each line — add new ideas as plain `- [ ] #<issue> <description>` lines
+   (or plain `- [ ] <description>`; refine-ticket then creates the issue) and leave the
+   rest alone.
    ```
 
 ## Steps
@@ -31,19 +34,20 @@ Do exactly one of the following, then stop and report (step 5). Never chain two 
 
    | phase | action |
    |---|---|
-   | `idle` or `done` | Close-out + selection, below. |
+   | `idle` or `released` | Close-out + selection, below. |
    | `refined` | Invoke `plan-ticket`. |
    | `planned` | Invoke `tdd-implement`. |
    | `implementing` | Invoke `tdd-implement` (it resumes from the plan itself). |
    | `reviewing` | Invoke `final-review`. |
+   | `done` | Invoke `release-ticket` (squash-merge into develop, promote to main, mark Done). |
 
-3. **`idle`/`done` — close-out.** Only when `phase` is `done` and `ticket` is set: mark that ticket's backlog line `[x]` and append a reference to `work/<ticket>/review.md`. Then, before touching branches: run `git status`; if the tree isn't clean, stop and report it (final-review should have left it clean — don't paper over that). Then `git switch main` (fall back to `git switch master` if `main` doesn't exist) — `refine-ticket` will otherwise branch the next ticket off the just-finished one. `phase` starting as `idle` needs no close-out.
+3. **`idle`/`released` — close-out.** Confirm the previous ticket really landed: when `phase` is `released`, its backlog line must be `[x]` and `gh issue view <issue> --json state` must say `CLOSED`; if not, stop and report the mismatch instead of picking a new ticket. Then run `git status`; if the tree isn't clean apart from backlog edits, stop and report it. Then `git fetch origin && git switch develop && git pull --ff-only` — every ticket branches off an up-to-date `develop`, never off `main` or the finished branch.
 
-4. **`idle`/`done` — selection.** Read the backlog top to bottom and pick the first `[ ]` line, skipping any whose description names a dependency that's still open (e.g. "after X ships") — log a skip like that rather than guessing an order, and ask the user only if two candidates are genuinely ambiguous in priority. If no eligible `[ ]` line exists, report **"Backlog is empty — nothing to do"** and stop; that's the signal for a wrapping loop to stop too.
+4. **`idle`/`released` — selection.** Read the backlog top to bottom and pick the first `[ ]` line, skipping any whose description names a dependency that's still open (e.g. "after X ships") — log a skip like that rather than guessing an order, and ask the user only if two candidates are genuinely ambiguous in priority. If no eligible `[ ]` line exists, report **"Backlog is empty — nothing to do"** and stop; that's the signal for a wrapping loop to stop too.
 
-   Invoke `refine-ticket` with the picked line's description text as its argument. Afterwards, re-read `.claude/state/workflow.json` for the derived ticket id:
-   - If `phase` is now `refined`, rewrite the line from `- [ ] <description>` to `- [~] <id>: <description>`.
-   - If `phase` is still `idle`/unchanged, `refine-ticket` stopped mid-interview (or asked for ticket-id confirmation) — leave the line as `- [ ]` but add `[[parked: refine-ticket @ idle]]` so the next call doesn't restart the interview from scratch.
+   Invoke `refine-ticket` with the picked line's text (including its `#<issue>`) as its argument. Afterwards, re-read `.claude/state/workflow.json`:
+   - If `phase` is now `refined`, `refine-ticket` has already rewritten the line to `[~] <id>: ...` and moved the board card to In Progress — nothing more to do.
+   - If `phase` is still `idle`/`released`, `refine-ticket` stopped mid-interview (or asked for ticket-id confirmation) — leave the line as `- [ ]` but add `[[parked: refine-ticket @ <phase>]]` so the next call doesn't restart the interview from scratch.
 
 5. **Report.** One short summary: phase before → phase after, the ticket id, and the artifact that changed (or the backlog line, for a close-out/selection). If the invoked skill stopped to ask the user something — ticket interview, ticket-id confirmation, plan approval — say exactly that instead of answering on its behalf; a human needs to be present for that turn, and this skill does not fabricate approval to keep a loop moving.
 
@@ -53,5 +57,6 @@ Do exactly one of the following, then stop and report (step 5). Never chain two 
 - Never invoke more than one phase skill per call.
 - Never fabricate or infer the user's approval of a ticket or plan.
 - Never write source code from this skill (the write-protection hook would block it outside `implementing` anyway); it only ever delegates.
-- Never reorder or delete backlog lines beyond updating a line's own status marker, ticket id, and `[[parked: ...]]` tag.
-- Don't try to commit backlog edits made while `phase` is `idle` — `guard-bash.sh` blocks commits in that phase; leave the edit uncommitted, the next phase skill's own commit will pick it up.
+- Never reorder or delete backlog lines; this skill only adds or removes a line's `[[parked: ...]]` tag.
+- Never merge PRs or touch `main`/`develop` beyond `git switch develop && git pull --ff-only` — merging is `release-ticket`'s job.
+- Don't try to commit backlog edits made while `phase` is `idle`/`released` — they would land on `develop`, which only takes PRs. Leave the edit uncommitted; `refine-ticket` carries it onto the new branch and commits it.

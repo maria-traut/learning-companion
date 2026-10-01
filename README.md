@@ -31,4 +31,10 @@ cp .env.example .env            # then adjust values
 
 ## Development workflow
 
-Features are built one ticket at a time: `refine-ticket` → `plan-ticket` → `tdd-implement` → `final-review`, orchestrated by `factory-manager` from `work/backlog.md`. Hooks in `.claude/hooks/` enforce the phase gates.
+Features are built one ticket at a time: `refine-ticket` → `plan-ticket` → `tdd-implement` → `final-review` → `release-ticket`, orchestrated by `factory-manager` from `work/backlog.md`, which mirrors the [GitHub issues](https://github.com/maria-traut/learning-companion/issues) and [project board](https://github.com/users/maria-traut/projects/5). Hooks in `.claude/hooks/` enforce the phase gates.
+
+Branching follows gitflow (details in `.claude/rules/git.md`):
+
+- `main` — released code. Changes only via a promotion PR from `develop` (merge commit).
+- `develop` — integration branch. Changes only via squash-merged PRs from `feature/<id>` or `fix/<id>`, plus the `chore(release): merge main into develop` sync merge before each promotion.
+- Every ticket is promoted to `main` before the next one starts.

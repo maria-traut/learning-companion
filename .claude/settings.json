@@ -2,6 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(bash .claude/hooks/set-state.sh:*)",
+      "Bash(bash .claude/scripts/board.sh:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh issue view:*)",
       "Bash(jq:*)",
       "Bash(.venv/bin/pytest:*)",
       "Bash(.venv/bin/ruff check:*)",

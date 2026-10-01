@@ -4,12 +4,15 @@ All feature work in this project follows a fixed pipeline. Each phase is a skill
 
 | Phase          | Skill          | Artifact                    | Exit condition                          |
 |----------------|----------------|-----------------------------|------------------------------------------|
-| `idle`         | —              | —                           | User brings a ticket                     |
-| `refined`      | `refine-ticket`| `work/<id>/ticket.md`       | User approves acceptance criteria        |
-| `planned`      | `plan-ticket`  | `work/<id>/plan.md`         | User approves the plan                   |
-| `implementing` | `tdd-implement`| green commits, ticked plan  | All plan steps done, suite green         |
-| `reviewing`    | `final-review` | `work/<id>/review.md`       | Verdict PASS                             |
-| `done`         | —              | pushed branch, PR           | —                                        |
+| `idle`         | —               | —                                   | User brings a ticket                     |
+| `refined`      | `refine-ticket` | `work/<id>/ticket.md`, branch from develop, board "In Progress" | User approves acceptance criteria |
+| `planned`      | `plan-ticket`   | `work/<id>/plan.md`                 | User approves the plan                   |
+| `implementing` | `tdd-implement` | green commits, ticked plan          | All plan steps done, suite green         |
+| `reviewing`    | `final-review`  | `work/<id>/review.md`               | Verdict PASS                             |
+| `done`         | `final-review`  | pushed branch, PR into develop      | `release-ticket` runs                    |
+| `released`     | `release-ticket`| squash on develop, promotion merged to main, issue closed, board "Done" | Next ticket is picked |
+
+The ticket's status is mirrored in three places that must always agree: the `work/backlog.md` marker (`[ ]` / `[~]` / `[x]`), the GitHub issue (open / closed), and the project board column (Todo / In Progress / Done). Only `refine-ticket` and `release-ticket` change them, via `.claude/scripts/board.sh`. Branching and merging follow `.claude/rules/git.md`.
 
 Rules that always apply:
 

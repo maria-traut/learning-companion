@@ -12,8 +12,17 @@ PROJECT_MARKER="src/manage.py"
 # tests are then only enforced at commit time.
 RUN_TESTS_ON_WRITE="true"
 
-# Branches that may never receive direct commits or force-pushes.
+# Gitflow. main only changes via a promotion PR from develop; develop only
+# changes via squash-merged PRs from feature/<id> or fix/<id>, plus the
+# merge commit that syncs main back into develop before a promotion.
 PROTECTED_BRANCHES="main|master"
+INTEGRATION_BRANCH="develop"
+WORK_BRANCH_PATTERN="(feature|fix)/[a-z0-9-]+"
+
+# GitHub repository and project board that mirror work/backlog.md.
+GH_OWNER="maria-traut"
+GH_REPO="learning-companion"
+GH_PROJECT_NUMBER="5"
 
 # Directories that count as production/test code (used by the write guard).
 # src = Django project and apps, tests = project-level tests.

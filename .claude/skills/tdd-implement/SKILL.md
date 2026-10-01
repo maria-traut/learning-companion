@@ -7,7 +7,7 @@ description: Execute the approved plan step by step with strict red-green-refact
 
 ## Preconditions
 
-Read `.claude/state/workflow.json`. The phase must be `planned` (fresh start) or `implementing` (resuming, e.g. after review findings). `work/<id>/plan.md` must exist, and the current branch must be `feat/<id>`. If any of these fail, stop and say which one.
+Read `.claude/state/workflow.json`. The phase must be `planned` (fresh start) or `implementing` (resuming, e.g. after review findings). `work/<id>/plan.md` must exist, and the current branch must equal the state's `branch` (`feature/<id>` or `fix/<id>`). If any of these fail, stop and say which one.
 
 On fresh start:
 
