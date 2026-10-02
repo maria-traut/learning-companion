@@ -152,6 +152,31 @@ def test_goal_list_links_to_goal_create_page(client, user):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize("status", Goal.Status.values)
+def test_goal_list_filtered_by_status_shows_only_own_matching_goals_newest_first(
+    client, django_user_model, user, status
+):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    titles = {
+        Goal.Status.PLANNED: "Learn Rust",
+        Goal.Status.IN_PROGRESS: "Learn Go",
+        Goal.Status.DONE: "Learn Elm",
+    }
+    for goal_status, title in titles.items():
+        create_goal(user, title, goal_status, day=3)
+    create_goal(user, "Learn Haskell", status, day=17)
+    create_goal(grace, "Learn COBOL", status, day=5)
+    client.force_login(user)
+
+    main = main_html(client.get(f"/goals/?status={status}"))
+
+    assert main.index("Learn Haskell") < main.index(titles[status])
+    for goal_status, title in titles.items():
+        assert (title in main) is (goal_status == status), title
+    assert "Learn COBOL" not in main
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("logged_in", [True, False], ids=["logged-in", "anonymous"])
 def test_nav_shows_goals_link_only_to_logged_in_users(client, user, logged_in):
     if logged_in:

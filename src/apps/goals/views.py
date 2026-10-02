@@ -12,7 +12,12 @@ class OwnGoalMixin(LoginRequiredMixin):
 
 
 class GoalListView(OwnGoalMixin, ListView):
-    pass
+    def get_queryset(self):
+        goals = super().get_queryset()
+        status = self.request.GET.get("status")
+        if status:
+            goals = goals.filter(status=status)
+        return goals
 
 
 class GoalCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):

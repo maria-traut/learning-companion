@@ -37,7 +37,7 @@
 - **AC2 and AC4 are folded into step 1's test:** step 1's test adds another user's goal with the same status and two same-status goals on different days. Scoping and order are then checked together with the filter itself.
 
 ## Steps
-- [ ] 1. `?status=<valid>` lists only the user's goals with that status, newest first.
+- [x] 1. `?status=<valid>` lists only the user's goals with that status, newest first.
   - Test: `src/apps/goals/tests/test_views.py`, parametrized over `planned`/`in_progress`/`done`.
   - Setup: one goal per status for "ada", a second goal in the requested status on a later day, and a "grace" goal in the requested status.
   - Asserts: only the matching titles appear, newest first, and grace's goal is absent.
