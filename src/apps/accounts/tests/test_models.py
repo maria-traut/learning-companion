@@ -45,6 +45,14 @@ def test_create_superuser_gives_the_user_one_profile(django_user_model):
 
 
 @pytest.mark.django_db
+def test_saving_an_existing_user_again_keeps_one_profile(user):
+    user.first_name = "Ada"
+    user.save()
+
+    assert Profile.objects.filter(user=user).count() == 1
+
+
+@pytest.mark.django_db
 def test_profile_displays_as_its_users_username(user):
     assert str(user.profile) == "ada"
 
