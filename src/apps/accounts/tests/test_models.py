@@ -60,6 +60,19 @@ def test_deleting_a_user_deletes_their_profile(user):
 
 
 @pytest.mark.django_db
+def test_profiles_and_focus_areas_are_many_to_many(django_user_model, user):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    django = FocusArea.objects.create(name="django")
+    sql = FocusArea.objects.create(name="sql")
+
+    user.profile.focus_areas.add(django, sql)
+    grace.profile.focus_areas.add(django)
+
+    assert list(user.profile.focus_areas.all()) == [django, sql]
+    assert set(django.profiles.all()) == {user.profile, grace.profile}
+
+
+@pytest.mark.django_db
 def test_profile_displays_as_its_users_username(user):
     assert str(user.profile) == "ada"
 
