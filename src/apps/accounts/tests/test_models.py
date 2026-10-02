@@ -38,6 +38,13 @@ def test_create_user_gives_the_user_one_empty_profile(django_user_model):
 
 
 @pytest.mark.django_db
+def test_create_superuser_gives_the_user_one_profile(django_user_model):
+    admin = django_user_model.objects.create_superuser(username="root", password=PASSWORD)
+
+    assert Profile.objects.filter(user=admin).count() == 1
+
+
+@pytest.mark.django_db
 def test_profile_displays_as_its_users_username(user):
     assert str(user.profile) == "ada"
 
