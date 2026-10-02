@@ -302,3 +302,16 @@ def test_profile_page_shows_only_the_logged_in_users_data(client, django_user_mo
     assert not any(text in adas_page for text in graces_values)
     assert all(text in graces_page for text in graces_values)
     assert not any(text in graces_page for text in adas_values)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
+    if method == "post":
+        response = client.post("/accounts/profile/edit/", {"name": "Intruder"})
+    else:
+        response = client.get("/accounts/profile/edit/")
+
+    assert response.status_code == 302
+    assert response.url == "/accounts/login/?next=/accounts/profile/edit/"
+    assert Profile.objects.get(user=user).name == ""
