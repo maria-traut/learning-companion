@@ -4,16 +4,16 @@
 As a learner, I want a profile with my name, cohort and focus areas attached to my account from the moment it exists, so that later features (profile page, goals, AI summaries) can rely on it being there.
 
 ## Acceptance criteria
-- [ ] AC1 A `Profile` is linked one-to-one to a `User` and reachable as `user.profile`; deleting the user deletes the profile.
-- [ ] AC2 `Profile` has an optional free-text `name` and an optional free-text `cohort` (both default to empty), and a many-to-many `focus_areas` to `FocusArea` that may be empty.
-- [ ] AC3 A `FocusArea` has a unique `name`; creating a second `FocusArea` with the same name raises `IntegrityError`, and `str(focus_area)` is its name.
-- [ ] AC4 A profile can hold several focus areas, and one focus area can be shared by several profiles.
-- [ ] AC5 A valid sign-up via `/accounts/signup/` creates exactly one profile for the new user, with empty `name`, empty `cohort` and no focus areas; the sign-up form itself is unchanged.
-- [ ] AC6 Creating a user via `create_user` or `create_superuser` (i.e. admin, `createsuperuser`) also creates exactly one profile.
-- [ ] AC7 Saving an existing user again does not create a second profile or fail.
-- [ ] AC8 A data migration creates exactly one profile for every existing user who does not already have one, and leaves existing profiles unchanged.
-- [ ] AC9 `str(profile)` is the user's username.
-- [ ] AC10 `Profile` and `FocusArea` are registered in the admin. Their list and add pages load for a superuser. On a `Profile` admin page, a superuser can edit `name`, `cohort` and `focus_areas`.
+- [x] AC1 A `Profile` is linked one-to-one to a `User` and reachable as `user.profile`; deleting the user deletes the profile.
+- [x] AC2 `Profile` has an optional free-text `name` and an optional free-text `cohort` (both default to empty), and a many-to-many `focus_areas` to `FocusArea` that may be empty.
+- [x] AC3 A `FocusArea` has a unique `name`; creating a second `FocusArea` with the same name raises `IntegrityError`, and `str(focus_area)` is its name.
+- [x] AC4 A profile can hold several focus areas, and one focus area can be shared by several profiles.
+- [x] AC5 A valid sign-up via `/accounts/signup/` creates exactly one profile for the new user, with empty `name`, empty `cohort` and no focus areas; the sign-up form itself is unchanged.
+- [x] AC6 Creating a user via `create_user` or `create_superuser` (i.e. admin, `createsuperuser`) also creates exactly one profile.
+- [x] AC7 Saving an existing user again does not create a second profile or fail.
+- [x] AC8 A data migration creates exactly one profile for every existing user who does not already have one, and leaves existing profiles unchanged.
+- [x] AC9 `str(profile)` is the user's username.
+- [x] AC10 `Profile` and `FocusArea` are registered in the admin. Their list and add pages load for a superuser. On a `Profile` admin page, a superuser can edit `name`, `cohort` and `focus_areas`.
 
 ## Out of scope
 - Profile page where a user views/edits their own profile (#4).
