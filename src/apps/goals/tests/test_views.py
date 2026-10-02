@@ -204,3 +204,39 @@ def test_forged_owner_and_id_fields_cannot_touch_another_users_goal(
     graces_goal.refresh_from_db()
     assert (graces_goal.user, graces_goal.title) == (grace, "Learn COBOL")
     assert Goal.objects.count() == 2
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("data", "error"),
+    [
+        (
+            {"title": "", "description": DESCRIPTION, "status": "planned"},
+            "This field is required.",
+        ),
+        (
+            {"title": "Learn Django", "description": "", "status": "planned"},
+            "This field is required.",
+        ),
+        (
+            {"title": "x" * 201, "description": DESCRIPTION, "status": "planned"},
+            "at most 200 characters (it has 201)",
+        ),
+        (
+            {"title": "Learn Django", "description": DESCRIPTION, "status": "archived"},
+            "Select a valid choice. archived is not one of the available choices.",
+        ),
+    ],
+    ids=["missing-title", "missing-description", "title-too-long", "unknown-status"],
+)
+def test_invalid_goal_create_rerenders_form_with_error_and_saves_nothing(
+    client, user, data, error
+):
+    client.force_login(user)
+
+    response = client.post("/goals/new/", data)
+
+    assert response.status_code == 200
+    assert "goals/goal_form.html" in template_names(response)
+    assert error in response.content.decode()
+    assert not Goal.objects.exists()
