@@ -79,3 +79,20 @@ def test_full_clean_requires_a_description(user):
     assert set(excinfo.value.error_dict) == {"description"}
     goal.description = DESCRIPTION
     goal.full_clean()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("title", "valid"),
+    [("", False), ("x" * 201, False), ("x" * 200, True)],
+    ids=["empty", "201-characters", "200-characters"],
+)
+def test_full_clean_requires_a_title_of_at_most_200_characters(user, title, valid):
+    goal = Goal(user=user, title=title, description=DESCRIPTION)
+
+    if valid:
+        goal.full_clean()
+    else:
+        with pytest.raises(ValidationError) as excinfo:
+            goal.full_clean()
+        assert set(excinfo.value.error_dict) == {"title"}
