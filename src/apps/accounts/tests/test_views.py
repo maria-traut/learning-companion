@@ -305,6 +305,16 @@ def test_profile_page_shows_only_the_logged_in_users_data(client, django_user_mo
 
 
 @pytest.mark.django_db
+def test_profile_page_links_to_the_edit_page(client, user):
+    client.force_login(user)
+
+    response = client.get("/accounts/profile/")
+
+    edit_link = r'<a href="/accounts/profile/edit/"[^>]*>\s*Edit profile\s*</a>'
+    assert re.search(edit_link, main_html(response))
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
     if method == "post":
