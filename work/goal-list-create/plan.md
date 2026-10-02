@@ -18,7 +18,7 @@
 
 ## Steps
 - [x] 1. Anonymous GET `/goals/` redirects to `/accounts/login/?next=/goals/` — test: `src/apps/goals/tests/test_views.py` — impl: `src/apps/goals/views.py` (`GoalListView`), `src/apps/goals/urls.py`, `src/config/urls.py`, `src/apps/goals/templates/goals/goal_list.html` — covers: AC1
-- [ ] 2. Logged-in GET `/goals/` returns 200 using `goals/goal_list.html` + `base.html`, with title "Goals · Learning Companion" — test: `src/apps/goals/tests/test_views.py` — impl: `goal_list.html` — covers: AC3
+- [x] 2. Logged-in GET `/goals/` returns 200 using `goals/goal_list.html` + `base.html`, with title "Goals · Learning Companion" — test: `src/apps/goals/tests/test_views.py` — impl: `goal_list.html` — covers: AC3
 - [ ] 3. The list shows each goal's title, status label and created date, newest first — test: `src/apps/goals/tests/test_views.py` — impl: `goal_list.html` — covers: AC4
 - [ ] 4. The list excludes another user's goals (Grace's goal titles don't appear in Ada's `main_html`) — test: `src/apps/goals/tests/test_views.py` — impl: `GoalListView.get_queryset` — covers: AC5
 - [ ] 5. The empty list shows an empty-state message — test: `src/apps/goals/tests/test_views.py` — impl: `goal_list.html` (`{% empty %}`) — covers: AC6
