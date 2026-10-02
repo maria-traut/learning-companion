@@ -68,7 +68,7 @@
 - [x] 17. *(test correction)* The sign-up form test asserts the exact set of input names in the form (`username`, `password1`, `password2`, ignoring `csrfmiddlewaretoken`) instead of only the absence of profile fields. Test: `test_views.py` (`test_signup_page_asks_for_no_profile_fields`, renamed to match). Impl: none. Verify with a temporary extra input. Covers: AC5.
 - [x] 18. *(refactor)* Rename the local `django` / `sql` variables in `test_models.py` and `test_admin.py` to `django_area` / `sql_area` so they don't shadow the package. Commit as `refactor(profile-model): ...`.
 - [x] 19. On an existing profile, the admin change page shows `user` read-only. A POST with a different `user` doesn't re-link the profile, and `name`, `cohort` and `focus_areas` stay editable. On the add page, `user` stays selectable. Test: `test_admin.py`. Impl: `admin.py` (`ProfileAdmin.get_readonly_fields` returns `["user"]` when `obj` is set). Step 13's test stops sending `user`, since the field becomes read-only on the change page. Covers: AC10 (security finding).
-- [ ] 20. *(workflow artifact)* Remove the unrelated `WRITE README.md` line from `work/auth/activity.log` on this branch. Commit as `docs(profile-model): ...`. No test.
+- [x] 20. *(workflow artifact)* Remove the unrelated `WRITE README.md` line from `work/auth/activity.log` on this branch. Commit as `docs(profile-model): ...`. No test.
 
 ## Coverage
 | AC | Steps |
