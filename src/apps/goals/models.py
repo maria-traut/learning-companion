@@ -12,6 +12,7 @@ class Goal(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="goals"
     )
     title = models.CharField(max_length=200)
+    description = models.TextField()
     status = models.CharField(max_length=20, choices=Status, default=Status.PLANNED)
 
     def __str__(self):

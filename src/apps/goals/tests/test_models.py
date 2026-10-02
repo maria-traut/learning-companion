@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from apps.goals.models import Goal
 
 PASSWORD = "correct-horse-battery-9"
+DESCRIPTION = "Work through the official tutorial."
 
 
 @pytest.fixture
@@ -59,9 +60,22 @@ def test_new_goal_starts_as_planned_and_displays_status_label(user):
 
 @pytest.mark.django_db
 def test_full_clean_rejects_an_unknown_status(user):
-    goal = Goal(user=user, title="Learn Django", status="archived")
+    goal = Goal(user=user, title="Learn Django", description=DESCRIPTION, status="archived")
 
     with pytest.raises(ValidationError) as excinfo:
         goal.full_clean()
 
+    assert set(excinfo.value.error_dict) == {"status"}
     assert [error.code for error in excinfo.value.error_dict["status"]] == ["invalid_choice"]
+
+
+@pytest.mark.django_db
+def test_full_clean_requires_a_description(user):
+    goal = Goal(user=user, title="Learn Django", description="")
+
+    with pytest.raises(ValidationError) as excinfo:
+        goal.full_clean()
+
+    assert set(excinfo.value.error_dict) == {"description"}
+    goal.description = DESCRIPTION
+    goal.full_clean()
