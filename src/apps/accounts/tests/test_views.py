@@ -401,6 +401,37 @@ def test_profile_edit_shows_profile_updated_message_on_profile_page(client, user
 
 
 @pytest.mark.django_db
+def test_forged_owner_and_extra_fields_cannot_touch_another_profile(
+    client, django_user_model, user
+):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    fill_profile(grace, "Grace Hopper", "Hamburg 2025-09", ["cobol"])
+    graces_profile = Profile.objects.get(user=grace)
+    client.force_login(user)
+
+    response = client.post(
+        "/accounts/profile/edit/",
+        {
+            "name": "Ada Lovelace",
+            "cohort": "Berlin",
+            "user": grace.pk,
+            "id": graces_profile.pk,
+            "pk": graces_profile.pk,
+        },
+    )
+
+    assert response.status_code == 302
+    adas_profile = Profile.objects.get(name="Ada Lovelace")
+    assert adas_profile.user == user
+    assert Profile.objects.filter(user=user).count() == 1
+    graces_profile.refresh_from_db()
+    assert graces_profile.user == grace
+    assert graces_profile.name == "Grace Hopper"
+    assert graces_profile.cohort == "Hamburg 2025-09"
+    assert [area.name for area in graces_profile.focus_areas.all()] == ["cobol"]
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
     if method == "post":
