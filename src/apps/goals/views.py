@@ -4,14 +4,15 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView
 
 from .forms import GoalForm
-from .models import Goal
 
 
-class GoalListView(LoginRequiredMixin, ListView):
-    model = Goal
-
+class OwnGoalMixin(LoginRequiredMixin):
     def get_queryset(self):
         return self.request.user.goals.all()
+
+
+class GoalListView(OwnGoalMixin, ListView):
+    pass
 
 
 class GoalCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -25,5 +26,5 @@ class GoalCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return super().form_valid(form)
 
 
-class GoalDetailView(LoginRequiredMixin, DetailView):
-    model = Goal
+class GoalDetailView(OwnGoalMixin, DetailView):
+    pass

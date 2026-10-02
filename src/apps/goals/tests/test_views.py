@@ -64,6 +64,13 @@ def form_field_names(response):
     return names - {"csrfmiddlewaretoken"}
 
 
+def foreign_or_missing_goal_pk(django_user_model, case):
+    if case == "missing":
+        return 999_999
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    return create_goal(grace, "Learn COBOL").pk
+
+
 def create_goal(user, title, status=Goal.Status.PLANNED, day=1):
     goal = Goal.objects.create(
         user=user, title=title, description=DESCRIPTION, status=status
@@ -292,3 +299,16 @@ def test_goal_detail_renders_for_its_owner(client, user):
     assert re.search(
         r"<title>\s*Learn Django · Learning Companion\s*</title>", response.content.decode()
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("case", ["other-user", "missing"])
+def test_goal_detail_returns_404_for_another_users_or_missing_goal(
+    client, django_user_model, user, case
+):
+    pk = foreign_or_missing_goal_pk(django_user_model, case)
+    client.force_login(user)
+
+    response = client.get(f"/goals/{pk}/")
+
+    assert response.status_code == 404

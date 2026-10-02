@@ -44,7 +44,7 @@
 ## Steps
 - [x] 1. Anonymous GET `/goals/<pk>/` redirects to `/accounts/login/?next=/goals/<pk>/` — test: `src/apps/goals/tests/test_views.py` — impl: `GoalDetailView` (bare, `LoginRequiredMixin`), `urls.py` (`detail`) — covers: AC1
 - [x] 2. Owner GET `/goals/<pk>/` returns 200 using `goals/goal_detail.html` + `base.html`, with title "<goal title> · Learning Companion" — test: `src/apps/goals/tests/test_views.py` — impl: `src/apps/goals/templates/goals/goal_detail.html` — covers: AC2
-- [ ] 3. Detail returns 404 for another user's goal and for a missing pk (parametrized `other-user` / `missing`) — test: `src/apps/goals/tests/test_views.py` — impl: `OwnGoalMixin.get_queryset`, applied to `GoalDetailView` — covers: AC12, AC13
+- [x] 3. Detail returns 404 for another user's goal and for a missing pk (parametrized `other-user` / `missing`) — test: `src/apps/goals/tests/test_views.py` — impl: `OwnGoalMixin.get_queryset`, applied to `GoalDetailView` — covers: AC12, AC13
 - [ ] 4. Detail page shows title, description, status label, created date and updated date — test: `src/apps/goals/tests/test_views.py` — impl: `goal_detail.html` — covers: AC3
 - [ ] 5. Each goal title in the list links to its detail page — test: `src/apps/goals/tests/test_views.py` — impl: `goal_list.html` — covers: AC5
 - [ ] 6. Anonymous GET and POST to `/goals/<pk>/edit/` redirect to login, and the goal is unchanged (parametrized over method) — test: `src/apps/goals/tests/test_views.py` — impl: `GoalUpdateView` (bare), `urls.py` (`update`) — covers: AC1
