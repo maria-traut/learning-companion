@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .forms import GoalForm
+from .models import Goal
 
 
 class OwnGoalMixin(LoginRequiredMixin):
@@ -12,7 +13,21 @@ class OwnGoalMixin(LoginRequiredMixin):
 
 
 class GoalListView(OwnGoalMixin, ListView):
-    pass
+    def status_filter(self):
+        status = self.request.GET.get("status")
+        return Goal.Status(status) if status in Goal.Status.values else None
+
+    def get_queryset(self):
+        goals = super().get_queryset()
+        status = self.status_filter()
+        if status:
+            goals = goals.filter(status=status)
+        return goals
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(
+            status_choices=Goal.Status.choices, status_filter=self.status_filter(), **kwargs
+        )
 
 
 class GoalCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):

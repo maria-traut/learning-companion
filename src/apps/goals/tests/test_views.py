@@ -88,6 +88,13 @@ def test_goal_list_redirects_anonymous_visitors_to_login(client):
     assert response.url == "/accounts/login/?next=/goals/"
 
 
+def test_filtered_goal_list_redirects_anonymous_visitors_to_login(client):
+    response = client.get("/goals/?status=done")
+
+    assert response.status_code == 302
+    assert response.url == "/accounts/login/?next=/goals/%3Fstatus%3Ddone"
+
+
 @pytest.mark.django_db
 def test_goal_list_renders_for_logged_in_users(client, user):
     client.force_login(user)
@@ -149,6 +156,107 @@ def test_goal_list_links_to_goal_create_page(client, user):
     main = main_html(client.get("/goals/"))
 
     assert re.search(r'<a href="/goals/new/"[^>]*>\s*New goal\s*</a>', main)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("status", Goal.Status.values)
+def test_goal_list_filtered_by_status_shows_only_own_matching_goals_newest_first(
+    client, django_user_model, user, status
+):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    titles = {
+        Goal.Status.PLANNED: "Learn Rust",
+        Goal.Status.IN_PROGRESS: "Learn Go",
+        Goal.Status.DONE: "Learn Elm",
+    }
+    for goal_status, title in titles.items():
+        create_goal(user, title, goal_status, day=3)
+    create_goal(user, "Learn Haskell", status, day=17)
+    create_goal(grace, "Learn COBOL", status, day=5)
+    client.force_login(user)
+
+    main = main_html(client.get(f"/goals/?status={status}"))
+
+    assert main.index("Learn Haskell") < main.index(titles[status])
+    for goal_status, title in titles.items():
+        assert (title in main) is (goal_status == status), title
+    assert "Learn COBOL" not in main
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "query", ["", "?status=", "?status=foo"], ids=["no-param", "empty", "unknown"]
+)
+def test_goal_list_ignores_missing_empty_or_unknown_status(client, user, query):
+    create_goal(user, "Learn Rust", Goal.Status.PLANNED)
+    create_goal(user, "Learn Go", Goal.Status.IN_PROGRESS)
+    create_goal(user, "Learn Elm", Goal.Status.DONE)
+    client.force_login(user)
+
+    response = client.get(f"/goals/{query}")
+
+    assert response.status_code == 200
+    main = main_html(response)
+    for title in ["Learn Rust", "Learn Go", "Learn Elm"]:
+        assert title in main, title
+
+
+def status_filter_html(response):
+    nav = re.search(
+        r'<nav aria-label="Filter by status"[^>]*>(.*?)</nav>', main_html(response), re.DOTALL
+    )
+    assert nav
+    return nav.group(1)
+
+
+@pytest.mark.django_db
+def test_goal_list_shows_status_filter_links(client, user):
+    client.force_login(user)
+
+    links = re.findall(
+        r'<a href="([^"]*)"[^>]*>\s*(.*?)\s*</a>', status_filter_html(client.get("/goals/"))
+    )
+
+    assert links == [
+        ("/goals/", "All"),
+        ("/goals/?status=planned", "Planned"),
+        ("/goals/?status=in_progress", "In progress"),
+        ("/goals/?status=done", "Done"),
+    ]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("query", "active"),
+    [
+        ("", "All"),
+        ("?status=planned", "Planned"),
+        ("?status=in_progress", "In progress"),
+        ("?status=done", "Done"),
+        ("?status=foo", "All"),
+    ],
+    ids=["no-param", "planned", "in-progress", "done", "unknown"],
+)
+def test_goal_list_marks_only_the_active_status_filter_link(client, user, query, active):
+    client.force_login(user)
+
+    nav = status_filter_html(client.get(f"/goals/{query}"))
+
+    current = re.findall(r'<a [^>]*aria-current="page"[^>]*>\s*(.*?)\s*</a>', nav)
+    assert current == [active]
+
+
+@pytest.mark.django_db
+def test_goal_list_shows_filter_specific_empty_state_when_filter_matches_nothing(
+    client, user
+):
+    create_goal(user, "Learn Rust", Goal.Status.PLANNED)
+    client.force_login(user)
+
+    main = main_html(client.get("/goals/?status=done"))
+
+    assert "No goals with status Done." in main
+    assert "No goals yet" not in main
 
 
 @pytest.mark.django_db
