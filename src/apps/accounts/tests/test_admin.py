@@ -29,8 +29,8 @@ def test_superuser_can_edit_name_cohort_and_focus_areas_of_a_profile(
     admin_client, django_user_model
 ):
     ada = django_user_model.objects.create_user(username="ada", password=PASSWORD)
-    django = FocusArea.objects.create(name="django")
-    sql = FocusArea.objects.create(name="sql")
+    django_area = FocusArea.objects.create(name="django")
+    sql_area = FocusArea.objects.create(name="sql")
     url = f"/admin/accounts/profile/{ada.profile.pk}/change/"
 
     page = admin_client.get(url).content.decode()
@@ -40,7 +40,7 @@ def test_superuser_can_edit_name_cohort_and_focus_areas_of_a_profile(
             "user": ada.pk,
             "name": "Ada Lovelace",
             "cohort": "Web Dev Berlin 2026-03",
-            "focus_areas": [django.pk, sql.pk],
+            "focus_areas": [django_area.pk, sql_area.pk],
         },
     )
 
@@ -50,7 +50,7 @@ def test_superuser_can_edit_name_cohort_and_focus_areas_of_a_profile(
     ada.profile.refresh_from_db()
     assert ada.profile.name == "Ada Lovelace"
     assert ada.profile.cohort == "Web Dev Berlin 2026-03"
-    assert list(ada.profile.focus_areas.all()) == [django, sql]
+    assert list(ada.profile.focus_areas.all()) == [django_area, sql_area]
 
 
 @pytest.mark.django_db
