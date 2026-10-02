@@ -42,6 +42,13 @@ def main_html(response):
     return main.group(1)
 
 
+def form_field_names(response):
+    form = re.search(r'<form method="post">(.*?)</form>', response.content.decode(), re.DOTALL)
+    assert form
+    names = set(re.findall(r'<(?:input|select|textarea)[^>]*name="([^"]+)"', form.group(1)))
+    return names - {"csrfmiddlewaretoken"}
+
+
 def focus_area_checkboxes(html):
     tags = re.findall(r'<input type="checkbox" name="focus_areas" value="(\d+)"([^>]*)>', html)
     return {int(pk): "checked" in attrs for pk, attrs in tags}
@@ -116,10 +123,7 @@ def test_valid_signup_creates_one_empty_profile_for_the_new_user(client, django_
 def test_signup_form_asks_only_for_username_and_passwords(client):
     response = client.get("/accounts/signup/")
 
-    form = re.search(r'<form method="post">(.*?)</form>', response.content.decode(), re.DOTALL)
-    assert form
-    field_names = set(re.findall(r'<(?:input|select|textarea)[^>]*name="([^"]+)"', form.group(1)))
-    assert field_names - {"csrfmiddlewaretoken"} == {"username", "password1", "password2"}
+    assert form_field_names(response) == {"username", "password1", "password2"}
 
 
 @pytest.mark.django_db
@@ -337,6 +341,16 @@ def test_profile_edit_form_is_prefilled_with_a_checkbox_per_focus_area(client, u
     checked = {pk for pk, is_checked in checkboxes.items() if is_checked}
     assert checked == set(user.profile.focus_areas.values_list("pk", flat=True))
     assert testing.pk not in checked
+
+
+@pytest.mark.django_db
+def test_profile_edit_form_has_exactly_name_cohort_and_focus_areas(client, user):
+    FocusArea.objects.create(name="django")
+    client.force_login(user)
+
+    response = client.get("/accounts/profile/edit/")
+
+    assert form_field_names(response) == {"name", "cohort", "focus_areas"}
 
 
 @pytest.mark.django_db
