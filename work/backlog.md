@@ -19,7 +19,7 @@ the rest alone.
 ## Goals
 - [x] goal-model: #5 Goal model (`title`, `description`, `status` planned/in-progress/done, `created_at`, `updated_at`) owned by a user, with migration and admin (after sign up/log in ships) — see work/goal-model/review.md
 - [x] goal-list-create: #6 Goal list and create views, scoped so a user only sees and creates their own goals (after goal model ships) — see work/goal-list-create/review.md
-- [ ] #7 Goal detail, edit and delete views, returning 404 for other users' goals (after goal list/create ships)
+- [~] goal-detail: #7 Goal detail, edit and delete views, returning 404 for other users' goals (after goal list/create ships)
 - [ ] #8 Filter the goal list by `status` via a query parameter (after goal list/create ships)
 ## Learning sessions
 - [ ] #9 LearningSession model linked to a Goal (`date`, `duration`, `notes`, `tags`), with migration and admin (after goal model ships)
