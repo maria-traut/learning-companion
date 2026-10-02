@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Delete goal · Learning Companion{% endblock %}
+
+{% block content %}
+  <h1>Delete goal</h1>
+  <p>Delete “{{ goal.title }}”? This cannot be undone.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Delete</button>
+  </form>
+{% endblock %}

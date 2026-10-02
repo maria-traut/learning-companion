@@ -9,6 +9,7 @@ from apps.goals.models import Goal
 
 PASSWORD = "correct-horse-battery-9"
 DESCRIPTION = "Work through the official tutorial."
+EDITED = {"title": "Learn Flask", "description": "Build a small API.", "status": "done"}
 
 
 @pytest.fixture
@@ -62,6 +63,13 @@ def form_field_names(response):
         re.findall(r'<(?:input|select|textarea)[^>]*\bname="([^"]+)"', own_post_form(response))
     )
     return names - {"csrfmiddlewaretoken"}
+
+
+def foreign_or_missing_goal_pk(django_user_model, case):
+    if case == "missing":
+        return 999_999
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    return create_goal(grace, "Learn COBOL").pk
 
 
 def create_goal(user, title, status=Goal.Status.PLANNED, day=1):
@@ -267,3 +275,265 @@ def test_invalid_goal_create_rerenders_form_with_error_and_saves_nothing(
     assert "goals/goal_form.html" in template_names(response)
     assert error in response.content.decode()
     assert not Goal.objects.exists()
+
+
+@pytest.mark.django_db
+def test_goal_detail_redirects_anonymous_visitors_to_login(client, user):
+    goal = create_goal(user, "Learn Django")
+
+    response = client.get(f"/goals/{goal.pk}/")
+
+    assert response.status_code == 302
+    assert response.url == f"/accounts/login/?next=/goals/{goal.pk}/"
+
+
+@pytest.mark.django_db
+def test_goal_detail_renders_for_its_owner(client, user):
+    goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    response = client.get(f"/goals/{goal.pk}/")
+
+    assert response.status_code == 200
+    assert "goals/goal_detail.html" in template_names(response)
+    assert "base.html" in template_names(response)
+    assert re.search(
+        r"<title>\s*Learn Django · Learning Companion\s*</title>", response.content.decode()
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("case", ["other-user", "missing"])
+def test_goal_detail_returns_404_for_another_users_or_missing_goal(
+    client, django_user_model, user, case
+):
+    pk = foreign_or_missing_goal_pk(django_user_model, case)
+    client.force_login(user)
+
+    response = client.get(f"/goals/{pk}/")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_goal_detail_shows_all_goal_fields(client, user):
+    goal = create_goal(user, "Learn Django", Goal.Status.IN_PROGRESS, day=3)
+    Goal.objects.filter(pk=goal.pk).update(updated_at=datetime(2026, 2, 14, tzinfo=UTC))
+    goal.refresh_from_db()
+    client.force_login(user)
+
+    main = main_html(client.get(f"/goals/{goal.pk}/"))
+
+    assert "Learn Django" in main
+    assert DESCRIPTION in main
+    assert "In progress" in main
+    assert date_format(localtime(goal.created_at)) in main
+    assert date_format(localtime(goal.updated_at)) in main
+
+
+@pytest.mark.django_db
+def test_goal_list_titles_link_to_their_detail_pages(client, user):
+    goals = [create_goal(user, "Learn Django"), create_goal(user, "Learn SQL", day=2)]
+    client.force_login(user)
+
+    main = main_html(client.get("/goals/"))
+
+    for goal in goals:
+        assert re.search(
+            rf'<a href="/goals/{goal.pk}/"[^>]*>\s*{re.escape(goal.title)}\s*</a>', main
+        ), goal.title
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+def test_goal_edit_redirects_anonymous_visitors_to_login(client, user, method):
+    goal = create_goal(user, "Learn Django")
+    url = f"/goals/{goal.pk}/edit/"
+
+    response = client.post(url, EDITED) if method == "post" else client.get(url)
+
+    assert response.status_code == 302
+    assert response.url == f"/accounts/login/?next={url}"
+    goal.refresh_from_db()
+    assert (goal.title, goal.description, goal.status) == (
+        "Learn Django",
+        DESCRIPTION,
+        Goal.Status.PLANNED,
+    )
+
+
+@pytest.mark.django_db
+def test_goal_edit_page_shows_form_prefilled_with_the_goal(client, user):
+    goal = create_goal(user, "Learn Django", Goal.Status.IN_PROGRESS)
+    client.force_login(user)
+
+    response = client.get(f"/goals/{goal.pk}/edit/")
+
+    assert response.status_code == 200
+    assert "goals/goal_form.html" in template_names(response)
+    assert re.search(r"<h1>\s*Edit goal\s*</h1>", main_html(response))
+    assert form_field_names(response) == {"title", "description", "status"}
+    form = own_post_form(response)
+    assert re.search(r'<input[^>]*name="title"[^>]*value="Learn Django"', form)
+    assert re.search(rf"<textarea[^>]*>\s*{re.escape(DESCRIPTION)}</textarea>", form)
+    assert re.search(r'<option value="in_progress"[^>]*\bselected\b', form)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+@pytest.mark.parametrize("case", ["other-user", "missing"])
+def test_goal_edit_returns_404_for_another_users_or_missing_goal(
+    client, django_user_model, user, case, method
+):
+    pk = foreign_or_missing_goal_pk(django_user_model, case)
+    client.force_login(user)
+    url = f"/goals/{pk}/edit/"
+
+    response = client.post(url, EDITED) if method == "post" else client.get(url)
+
+    assert response.status_code == 404
+    assert not Goal.objects.filter(title=EDITED["title"]).exists()
+    if case == "other-user":
+        graces_goal = Goal.objects.get(pk=pk)
+        assert (graces_goal.user.username, graces_goal.title) == ("grace", "Learn COBOL")
+
+
+@pytest.mark.django_db
+def test_valid_goal_edit_saves_changes_and_redirects_to_detail_with_message(client, user):
+    goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    response = client.post(f"/goals/{goal.pk}/edit/", EDITED, follow=True)
+
+    assert response.redirect_chain == [(f"/goals/{goal.pk}/", 302)]
+    assert "Goal updated." in messages_text(response)
+    goal.refresh_from_db()
+    assert (goal.user, goal.title, goal.description, goal.status) == (
+        user,
+        "Learn Flask",
+        "Build a small API.",
+        Goal.Status.DONE,
+    )
+
+
+@pytest.mark.django_db
+def test_forged_owner_and_id_fields_in_edit_cannot_touch_another_users_goal(
+    client, django_user_model, user
+):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    graces_goal = create_goal(grace, "Learn COBOL")
+    adas_goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    response = client.post(
+        f"/goals/{adas_goal.pk}/edit/",
+        {**EDITED, "user": grace.pk, "id": graces_goal.pk, "pk": graces_goal.pk},
+    )
+
+    assert response.status_code == 302
+    adas_goal.refresh_from_db()
+    assert (adas_goal.user, adas_goal.title) == (user, "Learn Flask")
+    graces_goal.refresh_from_db()
+    assert (graces_goal.user, graces_goal.title) == (grace, "Learn COBOL")
+    assert Goal.objects.count() == 2
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("changes", "error"),
+    [
+        ({"title": ""}, "This field is required."),
+        ({"description": ""}, "This field is required."),
+        ({"title": "x" * 201}, "at most 200 characters (it has 201)"),
+        (
+            {"status": "archived"},
+            "Select a valid choice. archived is not one of the available choices.",
+        ),
+    ],
+    ids=["missing-title", "missing-description", "title-too-long", "unknown-status"],
+)
+def test_invalid_goal_edit_rerenders_form_with_error_and_leaves_goal_unchanged(
+    client, user, changes, error
+):
+    goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    response = client.post(f"/goals/{goal.pk}/edit/", {**EDITED, **changes})
+
+    assert response.status_code == 200
+    assert "goals/goal_form.html" in template_names(response)
+    assert error in response.content.decode()
+    goal.refresh_from_db()
+    assert (goal.title, goal.description, goal.status) == (
+        "Learn Django",
+        DESCRIPTION,
+        Goal.Status.PLANNED,
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+def test_goal_delete_redirects_anonymous_visitors_to_login(client, user, method):
+    goal = create_goal(user, "Learn Django")
+    url = f"/goals/{goal.pk}/delete/"
+
+    response = getattr(client, method)(url)
+
+    assert response.status_code == 302
+    assert response.url == f"/accounts/login/?next={url}"
+    assert Goal.objects.filter(pk=goal.pk).exists()
+
+
+@pytest.mark.django_db
+def test_goal_delete_page_asks_to_confirm_deleting_the_goal(client, user):
+    goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    response = client.get(f"/goals/{goal.pk}/delete/")
+
+    assert response.status_code == 200
+    assert "goals/goal_confirm_delete.html" in template_names(response)
+    assert "base.html" in template_names(response)
+    assert re.search(r"Delete\s+“Learn Django”\?", main_html(response))
+    assert form_field_names(response) == set()
+    assert Goal.objects.filter(pk=goal.pk).exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+@pytest.mark.parametrize("case", ["other-user", "missing"])
+def test_goal_delete_returns_404_for_another_users_or_missing_goal(
+    client, django_user_model, user, case, method
+):
+    pk = foreign_or_missing_goal_pk(django_user_model, case)
+    client.force_login(user)
+
+    response = getattr(client, method)(f"/goals/{pk}/delete/")
+
+    assert response.status_code == 404
+    if case == "other-user":
+        assert Goal.objects.filter(pk=pk, user__username="grace").exists()
+
+
+@pytest.mark.django_db
+def test_goal_delete_removes_the_goal_and_redirects_to_list_with_message(client, user):
+    goal = create_goal(user, "Learn Django")
+    other = create_goal(user, "Learn SQL", day=2)
+    client.force_login(user)
+
+    response = client.post(f"/goals/{goal.pk}/delete/", follow=True)
+
+    assert response.redirect_chain == [("/goals/", 302)]
+    assert "Goal deleted." in messages_text(response)
+    assert list(Goal.objects.all()) == [other]
+
+
+@pytest.mark.django_db
+def test_goal_detail_links_to_edit_and_delete(client, user):
+    goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    main = main_html(client.get(f"/goals/{goal.pk}/"))
+
+    assert re.search(rf'<a href="/goals/{goal.pk}/edit/"[^>]*>\s*Edit\s*</a>', main)
+    assert re.search(rf'<a href="/goals/{goal.pk}/delete/"[^>]*>\s*Delete\s*</a>', main)

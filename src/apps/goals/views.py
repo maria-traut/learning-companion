@@ -1,17 +1,18 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .forms import GoalForm
-from .models import Goal
 
 
-class GoalListView(LoginRequiredMixin, ListView):
-    model = Goal
-
+class OwnGoalMixin(LoginRequiredMixin):
     def get_queryset(self):
         return self.request.user.goals.all()
+
+
+class GoalListView(OwnGoalMixin, ListView):
+    pass
 
 
 class GoalCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -23,3 +24,17 @@ class GoalCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+
+
+class GoalDetailView(OwnGoalMixin, DetailView):
+    pass
+
+
+class GoalUpdateView(OwnGoalMixin, SuccessMessageMixin, UpdateView):
+    form_class = GoalForm
+    success_message = "Goal updated."
+
+
+class GoalDeleteView(OwnGoalMixin, SuccessMessageMixin, DeleteView):
+    success_url = reverse_lazy("goals:list")
+    success_message = "Goal deleted."

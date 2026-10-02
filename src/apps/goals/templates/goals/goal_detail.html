@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ goal.title }} · Learning Companion{% endblock %}
+
+{% block content %}
+  <h1>{{ goal.title }}</h1>
+  <p>{{ goal.description|linebreaksbr }}</p>
+  <dl>
+    <dt>Status</dt>
+    <dd>{{ goal.get_status_display }}</dd>
+    <dt>Created</dt>
+    <dd><time datetime="{{ goal.created_at|date:'c' }}">{{ goal.created_at|date }}</time></dd>
+    <dt>Updated</dt>
+    <dd><time datetime="{{ goal.updated_at|date:'c' }}">{{ goal.updated_at|date }}</time></dd>
+  </dl>
+  <p>
+    <a href="{% url 'goals:update' goal.pk %}">Edit</a>
+    · <a href="{% url 'goals:delete' goal.pk %}">Delete</a>
+  </p>
+{% endblock %}
