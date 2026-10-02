@@ -432,6 +432,35 @@ def test_forged_owner_and_extra_fields_cannot_touch_another_profile(
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("data", "error"),
+    [
+        ({"name": "x" * 101, "cohort": "Berlin"}, "at most 100 characters (it has 101)"),
+        ({"name": "Ada", "cohort": "x" * 101}, "at most 100 characters (it has 101)"),
+        (
+            {"name": "Ada", "cohort": "Berlin", "focus_areas": [999]},
+            "Select a valid choice. 999 is not one of the available choices.",
+        ),
+    ],
+    ids=["name-too-long", "cohort-too-long", "unknown-focus-area"],
+)
+def test_invalid_profile_edit_rerenders_form_with_error_and_saves_nothing(
+    client, user, data, error
+):
+    fill_profile(user, "Ada", "Berlin", ["django"])
+    client.force_login(user)
+
+    response = client.post("/accounts/profile/edit/", data)
+
+    assert response.status_code == 200
+    assert "accounts/profile_form.html" in template_names(response)
+    assert error in response.content.decode()
+    profile = Profile.objects.get(user=user)
+    assert (profile.name, profile.cohort) == ("Ada", "Berlin")
+    assert [area.name for area in profile.focus_areas.all()] == ["django"]
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
     if method == "post":
