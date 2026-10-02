@@ -4,4 +4,13 @@
 
 {% block content %}
   <h1>Goals</h1>
+  <ul>
+    {% for goal in goal_list %}
+      <li>
+        <strong>{{ goal.title }}</strong>
+        · {{ goal.get_status_display }}
+        · <time datetime="{{ goal.created_at|date:'c' }}">{{ goal.created_at|date }}</time>
+      </li>
+    {% endfor %}
+  </ul>
 {% endblock %}
