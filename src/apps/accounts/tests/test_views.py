@@ -42,6 +42,16 @@ def main_html(response):
     return main.group(1)
 
 
+def profile_values(response):
+    dl = re.search(r"<dl>(.*?)</dl>", response.content.decode(), re.DOTALL)
+    assert dl
+    return [
+        value.strip()
+        for value in re.findall(r"<(?:dd|li)>([^<]*)</(?:dd|li)>", dl.group(1))
+        if value.strip()
+    ]
+
+
 def form_field_names(response):
     form = re.search(r'<form method="post">(.*?)</form>', response.content.decode(), re.DOTALL)
     assert form
@@ -304,19 +314,22 @@ def test_profile_page_shows_the_users_own_details(client, user):
     assert response.status_code == 200
     assert "accounts/profile_detail.html" in template_names(response)
     assert "base.html" in template_names(response)
-    content = main_html(response)
-    for text in ("ada", "Ada Lovelace", "Web Dev Berlin 2026-03", "django", "sql"):
-        assert text in content
+    assert profile_values(response) == [
+        "ada",
+        "Ada Lovelace",
+        "Web Dev Berlin 2026-03",
+        "django",
+        "sql",
+    ]
 
 
 @pytest.mark.django_db
 def test_empty_profile_page_shows_placeholders(client, user):
     client.force_login(user)
 
-    content = main_html(client.get("/accounts/profile/"))
+    response = client.get("/accounts/profile/")
 
-    assert content.count("Not set yet") == 2
-    assert "No focus areas yet" in content
+    assert profile_values(response) == ["ada", "Not set yet", "Not set yet", "No focus areas yet"]
 
 
 @pytest.mark.django_db
@@ -324,18 +337,18 @@ def test_profile_page_shows_only_the_logged_in_users_data(client, django_user_mo
     grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
     fill_profile(user, "Ada Lovelace", "Berlin 2026-03", ["django"])
     fill_profile(grace, "Grace Hopper", "Hamburg 2025-09", ["cobol"])
-    adas_values = ["ada", "Ada Lovelace", "Berlin 2026-03", "django"]
-    graces_values = ["grace", "Grace Hopper", "Hamburg 2025-09", "cobol"]
 
     client.force_login(user)
-    adas_page = main_html(client.get("/accounts/profile/"))
+    adas_page = client.get("/accounts/profile/")
     client.force_login(grace)
-    graces_page = main_html(client.get("/accounts/profile/"))
+    graces_page = client.get("/accounts/profile/")
 
-    assert all(text in adas_page for text in adas_values)
-    assert not any(text in adas_page for text in graces_values)
-    assert all(text in graces_page for text in graces_values)
-    assert not any(text in graces_page for text in adas_values)
+    assert profile_values(adas_page) == ["ada", "Ada Lovelace", "Berlin 2026-03", "django"]
+    assert profile_values(graces_page) == ["grace", "Grace Hopper", "Hamburg 2025-09", "cobol"]
+    assert "Grace Hopper" not in main_html(adas_page)
+    assert "Hamburg 2025-09" not in main_html(adas_page)
+    assert "Ada Lovelace" not in main_html(graces_page)
+    assert "Berlin 2026-03" not in main_html(graces_page)
 
 
 @pytest.mark.django_db
