@@ -129,6 +129,15 @@ def test_goal_list_shows_empty_state_when_user_has_no_goals(client, user):
 
 
 @pytest.mark.django_db
+def test_goal_list_links_to_goal_create_page(client, user):
+    client.force_login(user)
+
+    main = main_html(client.get("/goals/"))
+
+    assert re.search(r'<a href="/goals/new/"[^>]*>\s*New goal\s*</a>', main)
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_goal_create_redirects_anonymous_visitors_to_login(client, method):
     if method == "post":

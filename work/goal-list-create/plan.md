@@ -27,7 +27,7 @@
 - [x] 8. A valid POST creates one goal owned by the user with the submitted values, redirects to `/goals/` and shows "Goal created." — test: `src/apps/goals/tests/test_views.py` — impl: `GoalCreateView.form_valid`, `success_url`, `success_message` — covers: AC9
 - [x] 9. Characterization (expected green on first run, see Design decisions): forged `user`/`id`/`pk` POST fields are ignored; the new goal belongs to Ada and Grace's goal is unchanged — test: `src/apps/goals/tests/test_views.py` — impl: none expected — covers: AC10
 - [x] 10. Characterization (expected green on first run, see Design decisions): an invalid POST (missing title, missing description, title of 201 chars, unknown status) re-renders `goals/goal_form.html` with 200 and the error text, and creates no goal (parametrized with ids) — test: `src/apps/goals/tests/test_views.py` — impl: none expected — covers: AC11
-- [ ] 11. The goal list links to `/goals/new/` — test: `src/apps/goals/tests/test_views.py` — impl: `goal_list.html` — covers: AC7
+- [x] 11. The goal list links to `/goals/new/` — test: `src/apps/goals/tests/test_views.py` — impl: `goal_list.html` — covers: AC7
 - [ ] 12. The nav shows a "Goals" link to `/goals/` for logged-in users and not for anonymous visitors (parametrized: the logged-in case fails first) — test: `src/apps/goals/tests/test_views.py` — impl: `src/templates/base.html` — covers: AC12
 
 ## Coverage
