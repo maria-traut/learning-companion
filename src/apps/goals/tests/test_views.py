@@ -312,3 +312,19 @@ def test_goal_detail_returns_404_for_another_users_or_missing_goal(
     response = client.get(f"/goals/{pk}/")
 
     assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_goal_detail_shows_all_goal_fields(client, user):
+    goal = create_goal(user, "Learn Django", Goal.Status.IN_PROGRESS, day=3)
+    Goal.objects.filter(pk=goal.pk).update(updated_at=datetime(2026, 2, 14, tzinfo=UTC))
+    goal.refresh_from_db()
+    client.force_login(user)
+
+    main = main_html(client.get(f"/goals/{goal.pk}/"))
+
+    assert "Learn Django" in main
+    assert DESCRIPTION in main
+    assert "In progress" in main
+    assert date_format(localtime(goal.created_at)) in main
+    assert date_format(localtime(goal.updated_at)) in main
