@@ -389,6 +389,18 @@ def test_profile_edit_with_no_focus_areas_ticked_clears_them(client, user):
 
 
 @pytest.mark.django_db
+def test_profile_edit_shows_profile_updated_message_on_profile_page(client, user):
+    client.force_login(user)
+
+    response = client.post(
+        "/accounts/profile/edit/", {"name": "Ada", "cohort": "Berlin"}, follow=True
+    )
+
+    assert response.redirect_chain == [("/accounts/profile/", 302)]
+    assert "Profile updated" in messages_text(response)
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
     if method == "post":
