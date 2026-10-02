@@ -93,12 +93,13 @@ def test_valid_signup_creates_one_empty_profile_for_the_new_user(client, django_
     assert not user.profile.focus_areas.exists()
 
 
-def test_signup_page_asks_for_no_profile_fields(client):
+def test_signup_form_asks_only_for_username_and_passwords(client):
     response = client.get("/accounts/signup/")
 
-    html = response.content.decode()
-    for field in ("name", "cohort", "focus_areas"):
-        assert not re.search(rf'name="{field}"', html)
+    form = re.search(r'<form method="post">(.*?)</form>', response.content.decode(), re.DOTALL)
+    assert form
+    field_names = set(re.findall(r'<(?:input|select|textarea)[^>]*name="([^"]+)"', form.group(1)))
+    assert field_names - {"csrfmiddlewaretoken"} == {"username", "password1", "password2"}
 
 
 @pytest.mark.django_db
