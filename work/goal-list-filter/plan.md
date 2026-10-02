@@ -55,7 +55,7 @@
   - Test: `test_views.py`, parametrized over `""` → All, `planned`, `in_progress`, `done` and `foo` → All.
   - Impl: `views.py` (context adds `status_filter`) and `goal_list.html` (conditional `aria-current`).
   - Covers: AC6.
-- [ ] 5. When a valid filter matches nothing, the page shows "No goals with status <label>." and not "No goals yet.".
+- [x] 5. When a valid filter matches nothing, the page shows "No goals with status <label>." and not "No goals yet.".
   - Test: `test_views.py`. "ada" has only a planned goal and requests `?status=done`.
   - The existing "No goals yet" test still covers the unfiltered case.
   - Impl: `goal_list.html` (`{% empty %}` branch).

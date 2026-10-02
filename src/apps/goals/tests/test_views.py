@@ -240,6 +240,19 @@ def test_goal_list_marks_only_the_active_status_filter_link(client, user, query,
 
 
 @pytest.mark.django_db
+def test_goal_list_shows_filter_specific_empty_state_when_filter_matches_nothing(
+    client, user
+):
+    create_goal(user, "Learn Rust", Goal.Status.PLANNED)
+    client.force_login(user)
+
+    main = main_html(client.get("/goals/?status=done"))
+
+    assert "No goals with status Done." in main
+    assert "No goals yet" not in main
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("logged_in", [True, False], ids=["logged-in", "anonymous"])
 def test_nav_shows_goals_link_only_to_logged_in_users(client, user, logged_in):
     if logged_in:

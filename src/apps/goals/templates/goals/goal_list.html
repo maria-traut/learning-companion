@@ -21,7 +21,11 @@
         · <time datetime="{{ goal.created_at|date:'c' }}">{{ goal.created_at|date }}</time>
       </li>
     {% empty %}
-      <li>No goals yet.</li>
+      {% if status_filter %}
+        <li>No goals with status {{ status_filter.label }}.</li>
+      {% else %}
+        <li>No goals yet.</li>
+      {% endif %}
     {% endfor %}
   </ul>
 {% endblock %}
