@@ -124,3 +124,15 @@ def test_saving_a_goal_again_moves_only_updated_at(user):
     goal.refresh_from_db()
     assert goal.created_at == long_ago
     assert goal.updated_at > long_ago
+
+
+@pytest.mark.django_db
+def test_goals_are_listed_newest_first(user):
+    first, second, third = (
+        Goal.objects.create(user=user, title=title, description=DESCRIPTION)
+        for title in ("First", "Second", "Third")
+    )
+    for goal, day in ((first, 2), (second, 3), (third, 1)):
+        Goal.objects.filter(pk=goal.pk).update(created_at=datetime(2026, 1, day, tzinfo=UTC))
+
+    assert list(Goal.objects.all()) == [second, first, third]
