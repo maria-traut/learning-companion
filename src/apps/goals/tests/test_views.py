@@ -469,3 +469,16 @@ def test_invalid_goal_edit_rerenders_form_with_error_and_leaves_goal_unchanged(
         DESCRIPTION,
         Goal.Status.PLANNED,
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+def test_goal_delete_redirects_anonymous_visitors_to_login(client, user, method):
+    goal = create_goal(user, "Learn Django")
+    url = f"/goals/{goal.pk}/delete/"
+
+    response = getattr(client, method)(url)
+
+    assert response.status_code == 302
+    assert response.url == f"/accounts/login/?next={url}"
+    assert Goal.objects.filter(pk=goal.pk).exists()
