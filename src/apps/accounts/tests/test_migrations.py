@@ -2,12 +2,20 @@ import importlib
 
 import pytest
 from django.apps import apps
+from django.db import migrations
 
 from apps.accounts.models import Profile
 
 PASSWORD = "correct-horse-battery-9"
 
 backfill_migration = importlib.import_module("apps.accounts.migrations.0002_backfill_profiles")
+
+
+def test_backfill_migration_runs_backfill_profiles():
+    operation = backfill_migration.Migration.operations[0]
+
+    assert isinstance(operation, migrations.RunPython)
+    assert operation.code is backfill_migration.backfill_profiles
 
 
 @pytest.mark.django_db
