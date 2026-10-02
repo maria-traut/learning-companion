@@ -15,7 +15,10 @@ class Migration(migrations.Migration):
             name='FocusArea',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
+                ('name', models.CharField(max_length=50, unique=True)),
             ],
+            options={
+                'ordering': ['name'],
+            },
         ),
     ]
