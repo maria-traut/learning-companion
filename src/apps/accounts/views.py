@@ -38,4 +38,7 @@ class LogoutView(auth_views.LogoutView):
 
 
 class ProfileView(LoginRequiredMixin, DetailView):
-    pass
+    template_name = "accounts/profile_detail.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user.profile

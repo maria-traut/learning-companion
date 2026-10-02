@@ -5,7 +5,7 @@ from django.conf import settings
 from django.shortcuts import resolve_url
 from django.urls import reverse
 
-from apps.accounts.models import Profile
+from apps.accounts.models import FocusArea, Profile
 
 PASSWORD = "correct-horse-battery-9"
 
@@ -34,6 +34,21 @@ def nav_html(response):
 
 def signup_data(username="ada", password1=PASSWORD, password2=PASSWORD):
     return {"username": username, "password1": password1, "password2": password2}
+
+
+def main_html(response):
+    main = re.search(r"<main[^>]*>(.*?)</main>", response.content.decode(), re.DOTALL)
+    assert main
+    return main.group(1)
+
+
+def fill_profile(user, name, cohort, focus_area_names):
+    user.profile.name = name
+    user.profile.cohort = cohort
+    user.profile.save()
+    user.profile.focus_areas.set(
+        FocusArea.objects.get_or_create(name=area)[0] for area in focus_area_names
+    )
 
 
 def test_signup_page_is_served_to_anonymous_visitors(client):
@@ -253,3 +268,18 @@ def test_profile_page_redirects_anonymous_visitors_to_login(client):
 
     assert response.status_code == 302
     assert response.url == "/accounts/login/?next=/accounts/profile/"
+
+
+@pytest.mark.django_db
+def test_profile_page_shows_the_users_own_details(client, user):
+    fill_profile(user, "Ada Lovelace", "Web Dev Berlin 2026-03", ["django", "sql"])
+    client.force_login(user)
+
+    response = client.get("/accounts/profile/")
+
+    assert response.status_code == 200
+    assert "accounts/profile_detail.html" in template_names(response)
+    assert "base.html" in template_names(response)
+    content = main_html(response)
+    for text in ("ada", "Ada Lovelace", "Web Dev Berlin 2026-03", "django", "sql"):
+        assert text in content

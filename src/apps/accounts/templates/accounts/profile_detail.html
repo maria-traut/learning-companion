@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Profile · Learning Companion{% endblock %}
+
+{% block content %}
+  <h1>Profile</h1>
+  <dl>
+    <dt>Username</dt>
+    <dd>{{ profile.user.get_username }}</dd>
+    <dt>Name</dt>
+    <dd>{{ profile.name|default:"Not set yet" }}</dd>
+    <dt>Cohort</dt>
+    <dd>{{ profile.cohort|default:"Not set yet" }}</dd>
+    <dt>Focus areas</dt>
+    <dd>
+      <ul>
+        {% for focus_area in profile.focus_areas.all %}
+          <li>{{ focus_area }}</li>
+        {% empty %}
+          <li>No focus areas yet</li>
+        {% endfor %}
+      </ul>
+    </dd>
+  </dl>
+{% endblock %}
