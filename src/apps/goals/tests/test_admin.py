@@ -33,3 +33,22 @@ def test_admin_goal_list_shows_title_owner_status_and_timestamps(admin_client, u
 
     for field in ("title", "user", "status", "created_at", "updated_at"):
         assert re.search(rf'<th scope="col"[^>]*class="[^"]*\bcolumn-{field}\b', page), field
+
+
+@pytest.mark.django_db
+def test_admin_goal_list_can_be_filtered_by_status(admin_client, user):
+    for title, status in (("Plan", "planned"), ("Doing", "in_progress"), ("Done", "done")):
+        Goal.objects.create(user=user, title=title, description=DESCRIPTION, status=status)
+    done_goals = list(Goal.objects.filter(status="done"))
+
+    page = admin_client.get("/admin/goals/goal/").content.decode()
+    by_status = admin_client.get("/admin/goals/goal/", {"status": "done"})
+    by_filter_link = admin_client.get("/admin/goals/goal/", {"status__exact": "done"})
+
+    sidebar = re.search(r'<search id="changelist-filter"[^>]*>(.*?)</search>', page, re.DOTALL)
+    assert sidebar
+    assert re.search(r"By status", sidebar.group(1))
+    for label in ("Planned", "In progress", "Done"):
+        assert re.search(rf">\s*{label}\s*</a>", sidebar.group(1)), label
+    assert list(by_status.context["cl"].result_list) == done_goals
+    assert list(by_filter_link.context["cl"].result_list) == done_goals
