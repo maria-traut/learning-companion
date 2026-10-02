@@ -19,3 +19,6 @@ class Profile(models.Model):
     name = models.CharField(max_length=100, blank=True)
     cohort = models.CharField(max_length=100, blank=True)
     focus_areas = models.ManyToManyField(FocusArea, blank=True, related_name="profiles")
+
+    def __str__(self):
+        return self.user.get_username()

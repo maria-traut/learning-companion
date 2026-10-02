@@ -7,6 +7,11 @@ from apps.accounts.models import FocusArea, Profile
 PASSWORD = "correct-horse-battery-9"
 
 
+@pytest.fixture
+def user(django_user_model):
+    return django_user_model.objects.create_user(username="ada", password=PASSWORD)
+
+
 def test_focus_area_displays_as_its_name():
     focus_area = FocusArea(name="django")
 
@@ -33,8 +38,12 @@ def test_create_user_gives_the_user_one_empty_profile(django_user_model):
 
 
 @pytest.mark.django_db
-def test_raw_save_as_in_loaddata_creates_no_profile(django_user_model):
-    user = django_user_model.objects.create_user(username="ada", password=PASSWORD)
+def test_profile_displays_as_its_users_username(user):
+    assert str(user.profile) == "ada"
+
+
+@pytest.mark.django_db
+def test_raw_save_as_in_loaddata_creates_no_profile(django_user_model, user):
     user.profile.delete()
 
     post_save.send(sender=django_user_model, instance=user, created=True, raw=True)
