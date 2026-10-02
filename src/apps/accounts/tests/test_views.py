@@ -378,6 +378,17 @@ def test_valid_profile_edit_saves_replaces_focus_areas_and_redirects(client, use
 
 
 @pytest.mark.django_db
+def test_profile_edit_with_no_focus_areas_ticked_clears_them(client, user):
+    fill_profile(user, "Ada", "Berlin", ["django", "sql"])
+    client.force_login(user)
+
+    response = client.post("/accounts/profile/edit/", {"name": "Ada", "cohort": "Berlin"})
+
+    assert response.status_code == 302
+    assert not Profile.objects.get(user=user).focus_areas.exists()
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
     if method == "post":
