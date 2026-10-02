@@ -63,3 +63,29 @@ def test_admin_goal_list_can_be_searched_by_title(admin_client, user):
     response = admin_client.get("/admin/goals/goal/", {"q": "django"})
 
     assert set(response.context["cl"].result_list) == {django_goal, orm_goal}
+
+
+@pytest.mark.django_db
+def test_superuser_can_add_a_goal_for_a_chosen_owner(admin_client, user):
+    page = admin_client.get("/admin/goals/goal/add/").content.decode()
+
+    response = admin_client.post(
+        "/admin/goals/goal/add/",
+        {
+            "user": user.pk,
+            "title": "Learn Django",
+            "description": DESCRIPTION,
+            "status": "in_progress",
+        },
+    )
+
+    assert re.search(r'<select[^>]*name="user"', page)
+    assert response.status_code == 302
+    assert response.url == "/admin/goals/goal/"
+    goal = Goal.objects.get()
+    assert goal.user == user
+    assert (goal.title, goal.description, goal.status) == (
+        "Learn Django",
+        DESCRIPTION,
+        "in_progress",
+    )
