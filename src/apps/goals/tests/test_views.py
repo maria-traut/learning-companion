@@ -9,6 +9,7 @@ from apps.goals.models import Goal
 
 PASSWORD = "correct-horse-battery-9"
 DESCRIPTION = "Work through the official tutorial."
+EDITED = {"title": "Learn Flask", "description": "Build a small API.", "status": "done"}
 
 
 @pytest.fixture
@@ -341,3 +342,21 @@ def test_goal_list_titles_link_to_their_detail_pages(client, user):
         assert re.search(
             rf'<a href="/goals/{goal.pk}/"[^>]*>\s*{re.escape(goal.title)}\s*</a>', main
         ), goal.title
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+def test_goal_edit_redirects_anonymous_visitors_to_login(client, user, method):
+    goal = create_goal(user, "Learn Django")
+    url = f"/goals/{goal.pk}/edit/"
+
+    response = client.post(url, EDITED) if method == "post" else client.get(url)
+
+    assert response.status_code == 302
+    assert response.url == f"/accounts/login/?next={url}"
+    goal.refresh_from_db()
+    assert (goal.title, goal.description, goal.status) == (
+        "Learn Django",
+        DESCRIPTION,
+        Goal.Status.PLANNED,
+    )
