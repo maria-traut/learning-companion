@@ -283,3 +283,22 @@ def test_profile_page_shows_the_users_own_details(client, user):
     content = main_html(response)
     for text in ("ada", "Ada Lovelace", "Web Dev Berlin 2026-03", "django", "sql"):
         assert text in content
+
+
+@pytest.mark.django_db
+def test_profile_page_shows_only_the_logged_in_users_data(client, django_user_model, user):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    fill_profile(user, "Ada Lovelace", "Berlin 2026-03", ["django"])
+    fill_profile(grace, "Grace Hopper", "Hamburg 2025-09", ["cobol"])
+    adas_values = ["ada", "Ada Lovelace", "Berlin 2026-03", "django"]
+    graces_values = ["grace", "Grace Hopper", "Hamburg 2025-09", "cobol"]
+
+    client.force_login(user)
+    adas_page = main_html(client.get("/accounts/profile/"))
+    client.force_login(grace)
+    graces_page = main_html(client.get("/accounts/profile/"))
+
+    assert all(text in adas_page for text in adas_values)
+    assert not any(text in adas_page for text in graces_values)
+    assert all(text in graces_page for text in graces_values)
+    assert not any(text in graces_page for text in adas_values)
