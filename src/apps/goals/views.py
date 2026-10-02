@@ -33,3 +33,4 @@ class GoalDetailView(OwnGoalMixin, DetailView):
 
 class GoalUpdateView(LoginRequiredMixin, UpdateView):
     model = Goal
+    form_class = GoalForm

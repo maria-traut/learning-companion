@@ -360,3 +360,20 @@ def test_goal_edit_redirects_anonymous_visitors_to_login(client, user, method):
         DESCRIPTION,
         Goal.Status.PLANNED,
     )
+
+
+@pytest.mark.django_db
+def test_goal_edit_page_shows_form_prefilled_with_the_goal(client, user):
+    goal = create_goal(user, "Learn Django", Goal.Status.IN_PROGRESS)
+    client.force_login(user)
+
+    response = client.get(f"/goals/{goal.pk}/edit/")
+
+    assert response.status_code == 200
+    assert "goals/goal_form.html" in template_names(response)
+    assert re.search(r"<h1>\s*Edit goal\s*</h1>", main_html(response))
+    assert form_field_names(response) == {"title", "description", "status"}
+    form = own_post_form(response)
+    assert re.search(r'<input[^>]*name="title"[^>]*value="Learn Django"', form)
+    assert re.search(rf"<textarea[^>]*>\s*{re.escape(DESCRIPTION)}</textarea>", form)
+    assert re.search(r'<option value="in_progress"[^>]*\bselected\b', form)
