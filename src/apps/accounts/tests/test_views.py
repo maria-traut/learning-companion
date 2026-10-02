@@ -5,6 +5,8 @@ from django.conf import settings
 from django.shortcuts import resolve_url
 from django.urls import reverse
 
+from apps.accounts.models import Profile
+
 PASSWORD = "correct-horse-battery-9"
 
 
@@ -78,6 +80,26 @@ def test_signup_shows_account_created_message_on_login_page(client):
 
     assert response.redirect_chain == [("/accounts/login/", 302)]
     assert "Account created" in messages_text(response)
+
+
+@pytest.mark.django_db
+def test_valid_signup_creates_one_empty_profile_for_the_new_user(client, django_user_model):
+    client.post("/accounts/signup/", signup_data())
+
+    user = django_user_model.objects.get(username="ada")
+    assert Profile.objects.filter(user=user).count() == 1
+    assert user.profile.name == ""
+    assert user.profile.cohort == ""
+    assert not user.profile.focus_areas.exists()
+
+
+def test_signup_form_asks_only_for_username_and_passwords(client):
+    response = client.get("/accounts/signup/")
+
+    form = re.search(r'<form method="post">(.*?)</form>', response.content.decode(), re.DOTALL)
+    assert form
+    field_names = set(re.findall(r'<(?:input|select|textarea)[^>]*name="([^"]+)"', form.group(1)))
+    assert field_names - {"csrfmiddlewaretoken"} == {"username", "password1", "password2"}
 
 
 @pytest.mark.django_db
