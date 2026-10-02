@@ -49,6 +49,7 @@ class ProfileView(LoginRequiredMixin, DetailView):
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ProfileForm
     template_name = "accounts/profile_form.html"
+    success_url = reverse_lazy("accounts:profile")
 
     def get_object(self, queryset=None):
         return self.request.user.profile

@@ -354,6 +354,30 @@ def test_profile_edit_form_has_exactly_name_cohort_and_focus_areas(client, user)
 
 
 @pytest.mark.django_db
+def test_valid_profile_edit_saves_replaces_focus_areas_and_redirects(client, user):
+    fill_profile(user, "Ada", "Berlin", ["django", "sql"])
+    sql = FocusArea.objects.get(name="sql")
+    testing = FocusArea.objects.create(name="testing")
+    client.force_login(user)
+
+    response = client.post(
+        "/accounts/profile/edit/",
+        {
+            "name": "Ada Lovelace",
+            "cohort": "Web Dev Berlin 2026-03",
+            "focus_areas": [sql.pk, testing.pk],
+        },
+    )
+
+    assert response.status_code == 302
+    assert response.url == "/accounts/profile/"
+    profile = Profile.objects.get(user=user)
+    assert profile.name == "Ada Lovelace"
+    assert profile.cohort == "Web Dev Berlin 2026-03"
+    assert list(profile.focus_areas.all()) == [sql, testing]
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
     if method == "post":
