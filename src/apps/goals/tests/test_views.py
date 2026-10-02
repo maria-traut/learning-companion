@@ -267,3 +267,13 @@ def test_invalid_goal_create_rerenders_form_with_error_and_saves_nothing(
     assert "goals/goal_form.html" in template_names(response)
     assert error in response.content.decode()
     assert not Goal.objects.exists()
+
+
+@pytest.mark.django_db
+def test_goal_detail_redirects_anonymous_visitors_to_login(client, user):
+    goal = create_goal(user, "Learn Django")
+
+    response = client.get(f"/goals/{goal.pk}/")
+
+    assert response.status_code == 302
+    assert response.url == f"/accounts/login/?next=/goals/{goal.pk}/"
