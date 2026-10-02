@@ -52,3 +52,14 @@ def test_admin_goal_list_can_be_filtered_by_status(admin_client, user):
         assert re.search(rf">\s*{label}\s*</a>", sidebar.group(1)), label
     assert list(by_status.context["cl"].result_list) == done_goals
     assert list(by_filter_link.context["cl"].result_list) == done_goals
+
+
+@pytest.mark.django_db
+def test_admin_goal_list_can_be_searched_by_title(admin_client, user):
+    django_goal = Goal.objects.create(user=user, title="Learn Django", description=DESCRIPTION)
+    orm_goal = Goal.objects.create(user=user, title="Django ORM deep dive", description=DESCRIPTION)
+    Goal.objects.create(user=user, title="Learn SQL", description=DESCRIPTION)
+
+    response = admin_client.get("/admin/goals/goal/", {"q": "django"})
+
+    assert set(response.context["cl"].result_list) == {django_goal, orm_goal}
