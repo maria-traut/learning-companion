@@ -94,3 +94,18 @@ def test_goal_list_shows_empty_state_when_user_has_no_goals(client, user):
     main = main_html(client.get("/goals/"))
 
     assert "No goals yet" in main
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+def test_goal_create_redirects_anonymous_visitors_to_login(client, method):
+    if method == "post":
+        response = client.post(
+            "/goals/new/", {"title": "Intruder", "description": DESCRIPTION}
+        )
+    else:
+        response = client.get("/goals/new/")
+
+    assert response.status_code == 302
+    assert response.url == "/accounts/login/?next=/goals/new/"
+    assert not Goal.objects.exists()
