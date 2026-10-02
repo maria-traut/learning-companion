@@ -328,3 +328,16 @@ def test_goal_detail_shows_all_goal_fields(client, user):
     assert "In progress" in main
     assert date_format(localtime(goal.created_at)) in main
     assert date_format(localtime(goal.updated_at)) in main
+
+
+@pytest.mark.django_db
+def test_goal_list_titles_link_to_their_detail_pages(client, user):
+    goals = [create_goal(user, "Learn Django"), create_goal(user, "Learn SQL", day=2)]
+    client.force_login(user)
+
+    main = main_html(client.get("/goals/"))
+
+    for goal in goals:
+        assert re.search(
+            rf'<a href="/goals/{goal.pk}/"[^>]*>\s*{re.escape(goal.title)}\s*</a>', main
+        ), goal.title
