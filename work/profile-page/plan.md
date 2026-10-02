@@ -57,17 +57,24 @@
 - [x] 14. A logged-in user whose profile row was deleted gets exactly one empty profile when opening either page (200). Parametrized over `/accounts/profile/` and `/accounts/profile/edit/`. Expected red: `RelatedObjectDoesNotExist`. Test: `test_views.py`. Impl: `views.py` (`OwnProfileMixin.get_object` using `get_or_create`, used by both views in place of their own `get_object`). Covers: AC10.
 - [x] 15. For a logged-in user, the nav contains `<a href="/accounts/profile/">ada</a>`. The anonymous nav contains no `/accounts/profile/`; this part is already true, and checked by a temporary break. Test: `test_views.py`. Impl: `src/templates/base.html`. Covers: AC11.
 
+### Review round 1 (findings from `review.md`)
+- [ ] 16. *(characterization)* When at least one `FocusArea` exists, the edit page does **not** show "No focus areas available yet". Test: `test_views.py`. Impl: none expected. Verify by temporarily removing the `{% if %}` around the notice in `profile_form.html`. Covers: AC9. This is the medium finding.
+- [ ] 17. *(characterization)* An empty profile's page shows "Not set yet" for both `name` and `cohort`, and shows "No focus areas yet". Test: `test_views.py`. Impl: none expected. Verify by temporarily removing the `default:` filters and the `{% empty %}` branch in `profile_detail.html`. Covers: AC2.
+- [ ] 18. *(test correction)* The AC2 and AC3 tests check the profile values as whole `<dd>` elements, or `<li>` elements for focus areas, inside the profile's `<dl>`, instead of looking for substrings anywhere in `<main>`. Test: `test_views.py`, via a small helper that returns the `<dl>`'s `<dd>`/`<li>` texts. Impl: none. Commit as `test(profile-page): ...`. Covers: AC2, AC3.
+- [ ] 19. *(refactor)* `form_field_names` finds the post form by its `method="post"` attribute in any position, and skips forms with an `action` (the nav's logout form). `focus_area_checkboxes` reads `type`, `name`, `value` and `checked` from each `<input>` regardless of attribute order. Behaviour is unchanged, and the suite stays green. Commit as `refactor(profile-page): ...`.
+- [ ] 20. *(refactor)* Move `test_profile_edit_page_redirects_anonymous_visitors_to_login` next to `test_profile_page_redirects_anonymous_visitors_to_login`. Commit as `refactor(profile-page): ...`.
+
 ## Coverage
 | AC | Steps |
 |---|---|
 | AC1 anonymous redirected to login, POST changes nothing | 1, 4 |
-| AC2 own username, name, cohort, focus areas shown | 2 |
-| AC3 only own data shown | 3 |
+| AC2 own username, name, cohort, focus areas shown | 2, 17, 18 |
+| AC3 only own data shown | 3, 18 |
 | AC4 link to edit page | 5 |
 | AC5 pre-filled form, one checkbox per focus area, own ones checked | 6 |
 | AC6 valid save replaces values, redirects, "Profile updated" | 8, 9, 10 |
 | AC7 exactly three editable fields; forged/extra values can't touch other profiles | 7, 11 |
 | AC8 invalid input re-renders with error, saves nothing | 12 |
-| AC9 no focus areas available | 13 |
+| AC9 no focus areas available | 13, 16 |
 | AC10 missing profile created on the spot | 14 |
 | AC11 nav username links to profile, anonymous has no link | 15 |
