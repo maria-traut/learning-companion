@@ -246,3 +246,10 @@ def test_logged_in_user_is_redirected_home_from_signup_page(client, user):
 
     assert response.status_code == 302
     assert response.url == "/"
+
+
+def test_profile_page_redirects_anonymous_visitors_to_login(client):
+    response = client.get("/accounts/profile/")
+
+    assert response.status_code == 302
+    assert response.url == "/accounts/login/?next=/accounts/profile/"

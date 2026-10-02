@@ -2,10 +2,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DetailView
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
@@ -34,3 +35,7 @@ class LogoutView(auth_views.LogoutView):
         response = super().post(request, *args, **kwargs)
         messages.info(request, "You have been logged out.")
         return response
+
+
+class ProfileView(LoginRequiredMixin, DetailView):
+    pass
