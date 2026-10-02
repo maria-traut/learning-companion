@@ -51,3 +51,25 @@ def test_superuser_can_edit_name_cohort_and_focus_areas_of_a_profile(
     assert ada.profile.name == "Ada Lovelace"
     assert ada.profile.cohort == "Web Dev Berlin 2026-03"
     assert list(ada.profile.focus_areas.all()) == [django, sql]
+
+
+@pytest.mark.django_db
+def test_superuser_can_save_a_profile_with_name_cohort_and_focus_areas_left_empty(
+    admin_client, django_user_model
+):
+    ada = django_user_model.objects.create_user(username="ada", password=PASSWORD)
+    ada.profile.name = "Ada Lovelace"
+    ada.profile.cohort = "Web Dev Berlin 2026-03"
+    ada.profile.save()
+    ada.profile.focus_areas.add(FocusArea.objects.create(name="django"))
+
+    response = admin_client.post(
+        f"/admin/accounts/profile/{ada.profile.pk}/change/",
+        {"user": ada.pk, "name": "", "cohort": ""},
+    )
+
+    assert response.status_code == 302
+    ada.profile.refresh_from_db()
+    assert ada.profile.name == ""
+    assert ada.profile.cohort == ""
+    assert not ada.profile.focus_areas.exists()
