@@ -17,7 +17,7 @@ the rest alone.
 - [x] profile-model: #3 Profile model linked one-to-one to the user with `name`, `cohort` and a list of `focus_area` tags, created automatically on sign-up and registered in the admin (after sign up/log in ships) — see work/profile-model/review.md
 - [x] profile-page: #4 Profile page where a logged-in user views and edits only their own profile; anonymous users are redirected to login (after profile model ships) — see work/profile-page/review.md
 ## Goals
-- [ ] #5 Goal model (`title`, `description`, `status` planned/in-progress/done, `created_at`, `updated_at`) owned by a user, with migration and admin (after sign up/log in ships)
+- [x] goal-model: #5 Goal model (`title`, `description`, `status` planned/in-progress/done, `created_at`, `updated_at`) owned by a user, with migration and admin (after sign up/log in ships) — see work/goal-model/review.md
 - [ ] #6 Goal list and create views, scoped so a user only sees and creates their own goals (after goal model ships)
 - [ ] #7 Goal detail, edit and delete views, returning 404 for other users' goals (after goal list/create ships)
 - [ ] #8 Filter the goal list by `status` via a query parameter (after goal list/create ships)
