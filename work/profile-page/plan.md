@@ -62,7 +62,7 @@
 - [x] 17. *(characterization)* An empty profile's page shows "Not set yet" for both `name` and `cohort`, and shows "No focus areas yet". Test: `test_views.py`. Impl: none expected. Verify by temporarily removing the `default:` filters and the `{% empty %}` branch in `profile_detail.html`. Covers: AC2.
 - [x] 18. *(test correction)* The AC2 and AC3 tests check the profile values as whole `<dd>` elements, or `<li>` elements for focus areas, inside the profile's `<dl>`, instead of looking for substrings anywhere in `<main>`. Test: `test_views.py`, via a small helper that returns the `<dl>`'s `<dd>`/`<li>` texts. Impl: none. Commit as `test(profile-page): ...`. Covers: AC2, AC3.
 - [x] 19. *(refactor)* `form_field_names` finds the post form by its `method="post"` attribute in any position, and skips forms with an `action` (the nav's logout form). `focus_area_checkboxes` reads `type`, `name`, `value` and `checked` from each `<input>` regardless of attribute order. Behaviour is unchanged, and the suite stays green. Commit as `refactor(profile-page): ...`.
-- [ ] 20. *(refactor)* Move `test_profile_edit_page_redirects_anonymous_visitors_to_login` next to `test_profile_page_redirects_anonymous_visitors_to_login`. Commit as `refactor(profile-page): ...`.
+- [x] 20. *(refactor)* Move `test_profile_edit_page_redirects_anonymous_visitors_to_login` next to `test_profile_page_redirects_anonymous_visitors_to_login`. Commit as `refactor(profile-page): ...`.
 
 ## Coverage
 | AC | Steps |

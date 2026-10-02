@@ -321,6 +321,19 @@ def test_profile_page_redirects_anonymous_visitors_to_login(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
+    if method == "post":
+        response = client.post("/accounts/profile/edit/", {"name": "Intruder"})
+    else:
+        response = client.get("/accounts/profile/edit/")
+
+    assert response.status_code == 302
+    assert response.url == "/accounts/login/?next=/accounts/profile/edit/"
+    assert Profile.objects.get(user=user).name == ""
+
+
+@pytest.mark.django_db
 def test_profile_page_shows_the_users_own_details(client, user):
     fill_profile(user, "Ada Lovelace", "Web Dev Berlin 2026-03", ["django", "sql"])
     client.force_login(user)
@@ -549,16 +562,3 @@ def test_profile_pages_create_a_missing_profile_on_the_spot(client, user, url):
     profile = Profile.objects.get(user=user)
     assert (profile.name, profile.cohort) == ("", "")
     assert not profile.focus_areas.exists()
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize("method", ["get", "post"])
-def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
-    if method == "post":
-        response = client.post("/accounts/profile/edit/", {"name": "Intruder"})
-    else:
-        response = client.get("/accounts/profile/edit/")
-
-    assert response.status_code == 302
-    assert response.url == "/accounts/login/?next=/accounts/profile/edit/"
-    assert Profile.objects.get(user=user).name == ""
