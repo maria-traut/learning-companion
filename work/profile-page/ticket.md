@@ -10,7 +10,7 @@ As a logged-in learner, I want to see and edit my own name, cohort and focus are
 - [ ] AC4 The profile page links to `/accounts/profile/edit/`.
 - [ ] AC5 A logged-in `GET /accounts/profile/edit/` returns 200 with a form pre-filled with the user's current `name` and `cohort`. It has one checkbox per existing `FocusArea`, and the user's current focus areas are checked.
 - [ ] AC6 A valid `POST` to `/accounts/profile/edit/` saves the new `name`, `cohort` and focus areas to the user's own profile, replacing the previous set (unticking everything clears it). It redirects to `/accounts/profile/`, and the page then shows "Profile updated" in the messages area.
-- [ ] AC7 The edit form has exactly the fields `name`, `cohort` and `focus_areas`. A `POST` that also sends `user` (another user's id) or other extra fields still updates only the logged-in user's own profile, never changes its owner, and leaves the other user's profile untouched.
+- [ ] AC7 The form has exactly three editable fields: `name`, `cohort` and `focus_areas`. Submitted values or extra fields cannot change the profile owner or modify anyone else's profile.
 - [ ] AC8 An invalid `POST` re-renders the form with 200 and an error and saves nothing. Invalid means a `name` or `cohort` longer than 100 characters, or a focus area id that doesn't exist.
 - [ ] AC9 When no `FocusArea` exists, the edit page says that no focus areas are available yet, and saving `name` and `cohort` still works.
 - [ ] AC10 A logged-in user who has no profile row gets exactly one empty profile created when they open the profile page or the edit page, and the page returns 200.
