@@ -474,6 +474,20 @@ def test_profile_edit_without_focus_areas_says_so_and_still_saves(client, user):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize("url", ["/accounts/profile/", "/accounts/profile/edit/"])
+def test_profile_pages_create_a_missing_profile_on_the_spot(client, user, url):
+    user.profile.delete()
+    client.force_login(user)
+
+    response = client.get(url)
+
+    assert response.status_code == 200
+    profile = Profile.objects.get(user=user)
+    assert (profile.name, profile.cohort) == ("", "")
+    assert not profile.focus_areas.exists()
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
     if method == "post":

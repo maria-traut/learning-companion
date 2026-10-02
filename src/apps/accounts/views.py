@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
 
 from .forms import ProfileForm
+from .models import Profile
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
@@ -39,18 +40,18 @@ class LogoutView(auth_views.LogoutView):
         return response
 
 
-class ProfileView(LoginRequiredMixin, DetailView):
+class OwnProfileMixin(LoginRequiredMixin):
+    def get_object(self, queryset=None):
+        profile, _ = Profile.objects.get_or_create(user=self.request.user)
+        return profile
+
+
+class ProfileView(OwnProfileMixin, DetailView):
     template_name = "accounts/profile_detail.html"
 
-    def get_object(self, queryset=None):
-        return self.request.user.profile
 
-
-class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class ProfileUpdateView(OwnProfileMixin, SuccessMessageMixin, UpdateView):
     form_class = ProfileForm
     template_name = "accounts/profile_form.html"
     success_url = reverse_lazy("accounts:profile")
     success_message = "Profile updated."
-
-    def get_object(self, queryset=None):
-        return self.request.user.profile
