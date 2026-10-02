@@ -8,6 +8,8 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
 
+from .forms import ProfileForm
+
 
 class SignUpView(SuccessMessageMixin, CreateView):
     form_class = UserCreationForm
@@ -45,4 +47,8 @@ class ProfileView(LoginRequiredMixin, DetailView):
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
-    pass
+    form_class = ProfileForm
+    template_name = "accounts/profile_form.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user.profile

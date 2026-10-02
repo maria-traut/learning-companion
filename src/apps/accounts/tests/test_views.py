@@ -42,6 +42,11 @@ def main_html(response):
     return main.group(1)
 
 
+def focus_area_checkboxes(html):
+    tags = re.findall(r'<input type="checkbox" name="focus_areas" value="(\d+)"([^>]*)>', html)
+    return {int(pk): "checked" in attrs for pk, attrs in tags}
+
+
 def fill_profile(user, name, cohort, focus_area_names):
     user.profile.name = name
     user.profile.cohort = cohort
@@ -312,6 +317,26 @@ def test_profile_page_links_to_the_edit_page(client, user):
 
     edit_link = r'<a href="/accounts/profile/edit/"[^>]*>\s*Edit profile\s*</a>'
     assert re.search(edit_link, main_html(response))
+
+
+@pytest.mark.django_db
+def test_profile_edit_form_is_prefilled_with_a_checkbox_per_focus_area(client, user):
+    fill_profile(user, "Ada Lovelace", "Web Dev Berlin 2026-03", ["django", "sql"])
+    testing = FocusArea.objects.create(name="testing")
+    client.force_login(user)
+
+    response = client.get("/accounts/profile/edit/")
+
+    assert response.status_code == 200
+    assert "accounts/profile_form.html" in template_names(response)
+    html = response.content.decode()
+    assert re.search(r'<input[^>]*name="name"[^>]*value="Ada Lovelace"', html)
+    assert re.search(r'<input[^>]*name="cohort"[^>]*value="Web Dev Berlin 2026-03"', html)
+    checkboxes = focus_area_checkboxes(html)
+    assert set(checkboxes) == set(FocusArea.objects.values_list("pk", flat=True))
+    checked = {pk for pk, is_checked in checkboxes.items() if is_checked}
+    assert checked == set(user.profile.focus_areas.values_list("pk", flat=True))
+    assert testing.pk not in checked
 
 
 @pytest.mark.django_db
