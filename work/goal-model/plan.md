@@ -58,7 +58,7 @@
   - `migrations/0001_initial.py` (generated)
 
   Covers: AC7, AC1.
-- [ ] 2. A user can own several goals. `user.goals` contains exactly that user's goals and none of another user's. Test: `test_models.py`. Impl: `models.py` (`user` FK, `related_name="goals"`, CASCADE), regenerate `0001_initial.py`. Covers: AC1, AC5.
+- [x] 2. A user can own several goals. `user.goals` contains exactly that user's goals and none of another user's. Test: `test_models.py`. Impl: `models.py` (`user` FK, `related_name="goals"`, CASCADE), regenerate `0001_initial.py`. Covers: AC1, AC5.
 - [ ] 3. *(characterization)* Deleting a user deletes their goals and leaves another user's goal in place. Test: `test_models.py`. Impl: none expected. Verify with a temporary `on_delete=DO_NOTHING`. Covers: AC5.
 - [ ] 4. A new goal's `status` is `"planned"`. `Goal.Status` has exactly the values `planned`, `in_progress` and `done`, labelled "Planned", "In progress" and "Done", and `get_status_display()` returns the label. Test: `test_models.py`. Impl: `models.py` (`Status` TextChoices, `status` field), regenerate `0001_initial.py`. Covers: AC2.
 - [ ] 5. *(characterization)* `full_clean()` on a goal whose status is `"archived"` raises a `ValidationError` with an `invalid_choice` error on `status`. Test: `test_models.py`. Impl: none expected. Verify by temporarily removing `choices=`. Covers: AC2.
