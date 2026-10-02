@@ -175,3 +175,32 @@ def test_valid_goal_create_saves_goal_for_user_and_redirects_with_message(client
         DESCRIPTION,
         Goal.Status.IN_PROGRESS,
     )
+
+
+@pytest.mark.django_db
+def test_forged_owner_and_id_fields_cannot_touch_another_users_goal(
+    client, django_user_model, user
+):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    graces_goal = create_goal(grace, "Learn COBOL")
+    client.force_login(user)
+
+    response = client.post(
+        "/goals/new/",
+        {
+            "title": "Learn Django",
+            "description": DESCRIPTION,
+            "status": "planned",
+            "user": grace.pk,
+            "id": graces_goal.pk,
+            "pk": graces_goal.pk,
+        },
+    )
+
+    assert response.status_code == 302
+    adas_goal = Goal.objects.get(title="Learn Django")
+    assert adas_goal.user == user
+    assert adas_goal.pk != graces_goal.pk
+    graces_goal.refresh_from_db()
+    assert (graces_goal.user, graces_goal.title) == (grace, "Learn COBOL")
+    assert Goal.objects.count() == 2
