@@ -35,5 +35,6 @@ class GoalUpdateView(OwnGoalMixin, SuccessMessageMixin, UpdateView):
     success_message = "Goal updated."
 
 
-class GoalDeleteView(OwnGoalMixin, DeleteView):
-    pass
+class GoalDeleteView(OwnGoalMixin, SuccessMessageMixin, DeleteView):
+    success_url = reverse_lazy("goals:list")
+    success_message = "Goal deleted."

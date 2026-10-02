@@ -513,3 +513,16 @@ def test_goal_delete_returns_404_for_another_users_or_missing_goal(
     assert response.status_code == 404
     if case == "other-user":
         assert Goal.objects.filter(pk=pk, user__username="grace").exists()
+
+
+@pytest.mark.django_db
+def test_goal_delete_removes_the_goal_and_redirects_to_list_with_message(client, user):
+    goal = create_goal(user, "Learn Django")
+    other = create_goal(user, "Learn SQL", day=2)
+    client.force_login(user)
+
+    response = client.post(f"/goals/{goal.pk}/delete/", follow=True)
+
+    assert response.redirect_chain == [("/goals/", 302)]
+    assert "Goal deleted." in messages_text(response)
+    assert list(Goal.objects.all()) == [other]
