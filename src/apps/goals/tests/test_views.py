@@ -194,6 +194,30 @@ def test_goal_list_ignores_missing_empty_or_unknown_status(client, user, query):
         assert title in main, title
 
 
+def status_filter_html(response):
+    nav = re.search(
+        r'<nav aria-label="Filter by status"[^>]*>(.*?)</nav>', main_html(response), re.DOTALL
+    )
+    assert nav
+    return nav.group(1)
+
+
+@pytest.mark.django_db
+def test_goal_list_shows_status_filter_links(client, user):
+    client.force_login(user)
+
+    links = re.findall(
+        r'<a href="([^"]*)"[^>]*>\s*(.*?)\s*</a>', status_filter_html(client.get("/goals/"))
+    )
+
+    assert links == [
+        ("/goals/", "All"),
+        ("/goals/?status=planned", "Planned"),
+        ("/goals/?status=in_progress", "In progress"),
+        ("/goals/?status=done", "Done"),
+    ]
+
+
 @pytest.mark.django_db
 @pytest.mark.parametrize("logged_in", [True, False], ids=["logged-in", "anonymous"])
 def test_nav_shows_goals_link_only_to_logged_in_users(client, user, logged_in):

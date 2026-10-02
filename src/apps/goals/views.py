@@ -24,6 +24,9 @@ class GoalListView(OwnGoalMixin, ListView):
             goals = goals.filter(status=status)
         return goals
 
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(status_choices=Goal.Status.choices, **kwargs)
+
 
 class GoalCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = GoalForm

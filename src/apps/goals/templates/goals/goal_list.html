@@ -5,6 +5,14 @@
 {% block content %}
   <h1>Goals</h1>
   <p><a href="{% url 'goals:create' %}">New goal</a></p>
+  <nav aria-label="Filter by status">
+    <ul>
+      <li><a href="{% url 'goals:list' %}">All</a></li>
+      {% for value, label in status_choices %}
+        <li><a href="{% url 'goals:list' %}?status={{ value }}">{{ label }}</a></li>
+      {% endfor %}
+    </ul>
+  </nav>
   <ul>
     {% for goal in goal_list %}
       <li>

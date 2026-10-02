@@ -47,7 +47,7 @@
   - Test: `test_views.py`, parametrized with ids `no-param` / `empty` / `unknown`, using `?status=foo`. Red because step 1 filters any non-empty value.
   - Impl: `views.py`. Add the `status_filter` helper, which validates against `Goal.Status`, and use it in `get_queryset`.
   - Covers: AC3.
-- [ ] 3. The list page shows the filter links "All" → `/goals/`, "Planned" → `/goals/?status=planned`, "In progress" → `/goals/?status=in_progress` and "Done" → `/goals/?status=done`, in that order.
+- [x] 3. The list page shows the filter links "All" → `/goals/`, "Planned" → `/goals/?status=planned`, "In progress" → `/goals/?status=in_progress` and "Done" → `/goals/?status=done`, in that order.
   - Test: `test_views.py`.
   - Impl: `views.py` (`get_context_data` adds `status_choices`) and `goals/goal_list.html` (the `<nav>` link row).
   - Covers: AC5.
