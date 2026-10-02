@@ -61,11 +61,20 @@
 - [x] 12. For a superuser, the changelist and add pages of `Profile` and `FocusArea` (`/admin/accounts/profile/`, `/admin/accounts/profile/add/`, `/admin/accounts/focusarea/`, `/admin/accounts/focusarea/add/`) return 200. Parametrized with `ids=`. Test: `src/apps/accounts/tests/test_admin.py`. Impl: `src/apps/accounts/admin.py` (`ProfileAdmin`, `FocusAreaAdmin`). Covers: AC10.
 - [x] 13. *(characterization)* A superuser POSTs to a profile's admin change page with a new `name`, a new `cohort` and two focus areas. The response redirects, and the reloaded profile has those values. The change page has `name`, `cohort` and `focus_areas` inputs. Test: `test_admin.py`. Impl: none expected. Covers: AC10.
 
+### Review round 1 (findings from `review.md`)
+- [ ] 14. *(characterization)* A superuser saves a profile through its admin change page with empty `name`, empty `cohort` and no `focus_areas`. The response redirects, and the reloaded profile is empty. Test: `test_admin.py`. Impl: none expected. Verify by temporarily removing `blank=True` from each of the three fields in turn. Covers: AC2. Medium finding.
+- [ ] 15. *(test correction)* The cascade test captures `user.profile.pk` before deleting the user and asserts that this pk no longer exists, so it can't pass vacuously. Test: `test_models.py`. Impl: none. Commit as `test(profile-model): ...`. Covers: AC1.
+- [ ] 16. *(test correction)* The backfill test also asserts that `0002_backfill_profiles` runs `backfill_profiles`, i.e. that `Migration.operations[0]` is a `RunPython` whose `code` is that function. Verify by temporarily wiring `RunPython.noop` as the forward code. Test: `test_migrations.py`. Impl: none. Covers: AC8.
+- [ ] 17. *(test correction)* The sign-up form test asserts the exact set of input names in the form (`username`, `password1`, `password2`, ignoring `csrfmiddlewaretoken`) instead of only the absence of profile fields. Test: `test_views.py` (`test_signup_page_asks_for_no_profile_fields`, renamed to match). Impl: none. Verify with a temporary extra input. Covers: AC5.
+- [ ] 18. *(refactor)* Rename the local `django` / `sql` variables in `test_models.py` and `test_admin.py` to `django_area` / `sql_area` so they don't shadow the package. Commit as `refactor(profile-model): ...`.
+- [ ] 19. On an existing profile, the admin change page shows `user` read-only. A POST with a different `user` doesn't re-link the profile, and `name`, `cohort` and `focus_areas` stay editable. On the add page, `user` stays selectable. Test: `test_admin.py`. Impl: `admin.py` (`ProfileAdmin.get_readonly_fields` returns `["user"]` when `obj` is set). Step 13's test stops sending `user`, since the field becomes read-only on the change page. Covers: AC10 (security finding).
+- [ ] 20. *(workflow artifact)* Remove the unrelated `WRITE README.md` line from `work/auth/activity.log` on this branch. Commit as `docs(profile-model): ...`. No test.
+
 ## Coverage
 | AC | Steps |
 |---|---|
 | AC1 one-to-one, `user.profile`, cascade delete | 3, 8 |
-| AC2 fields and defaults, M2M may be empty | 3, 9 |
+| AC2 fields and defaults, M2M may be empty | 3, 9, 14 |
 | AC3 `FocusArea` unique name, `str` | 1, 2 |
 | AC4 many focus areas per profile, shared across profiles | 9 |
 | AC5 sign-up creates one empty profile, form unchanged | 10 |
@@ -73,5 +82,5 @@
 | AC7 re-saving a user creates no second profile | 7 |
 | AC8 backfill migration | 11 |
 | AC9 `str(profile)` is the username | 5 |
-| AC10 admin registration and editing | 12, 13 |
+| AC10 admin registration and editing | 12, 13, 19 |
 | — defensive `raw` guard (no AC) | 4 |
