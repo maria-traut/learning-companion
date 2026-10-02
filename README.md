@@ -1,6 +1,6 @@
 # Learning Companion
 
-Track learning goals and sessions, attach reference material, and get AI-powered progress summaries and next steps. Built with Django as part of Recap Project 6 (see `instructions/`), developed through an AI-factory pipeline (see [docs/ai-factory-workflow.md](docs/ai-factory-workflow.md)).
+Track learning goals and sessions, attach reference material, and get AI-powered progress summaries and next steps. Built with Django as part of Recap Project 6 (see `instructions/`), developed through an AI-factory pipeline (see `.claude/rules/workflow.md`).
 
 ## Stack
 
