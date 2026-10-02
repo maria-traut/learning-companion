@@ -15,7 +15,7 @@ the rest alone.
 ## Authentication and profile
 - [x] auth: #2 Sign up, log in and log out with Django's built-in auth views, using the base layout; nav shows login state (after base layout ships) — see work/auth/review.md
 - [x] profile-model: #3 Profile model linked one-to-one to the user with `name`, `cohort` and a list of `focus_area` tags, created automatically on sign-up and registered in the admin (after sign up/log in ships) — see work/profile-model/review.md
-- [ ] #4 Profile page where a logged-in user views and edits only their own profile; anonymous users are redirected to login (after profile model ships)
+- [x] profile-page: #4 Profile page where a logged-in user views and edits only their own profile; anonymous users are redirected to login (after profile model ships) — see work/profile-page/review.md
 ## Goals
 - [ ] #5 Goal model (`title`, `description`, `status` planned/in-progress/done, `created_at`, `updated_at`) owned by a user, with migration and admin (after sign up/log in ships)
 - [ ] #6 Goal list and create views, scoped so a user only sees and creates their own goals (after goal model ships)

@@ -2,10 +2,14 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DetailView, UpdateView
+
+from .forms import ProfileForm
+from .models import Profile
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
@@ -34,3 +38,20 @@ class LogoutView(auth_views.LogoutView):
         response = super().post(request, *args, **kwargs)
         messages.info(request, "You have been logged out.")
         return response
+
+
+class OwnProfileMixin(LoginRequiredMixin):
+    def get_object(self, queryset=None):
+        profile, _ = Profile.objects.get_or_create(user=self.request.user)
+        return profile
+
+
+class ProfileView(OwnProfileMixin, DetailView):
+    template_name = "accounts/profile_detail.html"
+
+
+class ProfileUpdateView(OwnProfileMixin, SuccessMessageMixin, UpdateView):
+    form_class = ProfileForm
+    template_name = "accounts/profile_form.html"
+    success_url = reverse_lazy("accounts:profile")
+    success_message = "Profile updated."
