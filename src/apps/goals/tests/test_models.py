@@ -1,5 +1,8 @@
+from datetime import UTC, datetime
+
 import pytest
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apps.goals.models import Goal
 
@@ -96,3 +99,28 @@ def test_full_clean_requires_a_title_of_at_most_200_characters(user, title, vali
         with pytest.raises(ValidationError) as excinfo:
             goal.full_clean()
         assert set(excinfo.value.error_dict) == {"title"}
+
+
+@pytest.mark.django_db
+def test_goal_timestamps_are_set_when_it_is_created(user):
+    before = timezone.now()
+    goal = Goal.objects.create(user=user, title="Learn Django", description=DESCRIPTION)
+    after = timezone.now()
+
+    assert before <= goal.created_at <= after
+    assert before <= goal.updated_at <= after
+
+
+@pytest.mark.django_db
+def test_saving_a_goal_again_moves_only_updated_at(user):
+    goal = Goal.objects.create(user=user, title="Learn Django", description=DESCRIPTION)
+    long_ago = datetime(2025, 1, 1, tzinfo=UTC)
+    Goal.objects.filter(pk=goal.pk).update(created_at=long_ago, updated_at=long_ago)
+    goal.refresh_from_db()
+
+    goal.title = "Learn Django properly"
+    goal.save()
+
+    goal.refresh_from_db()
+    assert goal.created_at == long_ago
+    assert goal.updated_at > long_ago
