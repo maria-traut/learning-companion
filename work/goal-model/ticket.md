@@ -4,18 +4,18 @@
 As a learner, I want my learning goals stored with a title, a description and a status (planned, in progress, done), so that later features (goal pages, sessions, resources, AI summaries, the dashboard) have a goal to hang off. As an admin, I want to manage goals in the Django admin.
 
 ## Acceptance criteria
-- [ ] AC1 A new `goals` app is installed. A `Goal` has `title`, `description`, `status`, `created_at`, `updated_at` and an owning `user`, and is reachable from the user as `user.goals`.
-- [ ] AC2 `status` only allows `planned`, `in_progress` and `done`, labelled "Planned", "In progress" and "Done". A new goal defaults to `planned`. `full_clean()` rejects any other value.
-- [ ] AC3 `title` and `description` are both required. `full_clean()` raises a `ValidationError` on `title` when it is empty or longer than 200 characters, and on `description` when it is empty.
-- [ ] AC4 `created_at` and `updated_at` are set automatically when a goal is created. Saving the goal again leaves `created_at` unchanged and moves `updated_at` forward.
-- [ ] AC5 A user can own several goals. `user.goals` contains only that user's goals. Deleting a user deletes their goals and leaves other users' goals in place.
-- [ ] AC6 Goals are ordered newest first by `created_at` by default.
-- [ ] AC7 `str(goal)` is its title.
-- [ ] AC8 `Goal` is registered in the admin:
+- [x] AC1 A new `goals` app is installed. A `Goal` has `title`, `description`, `status`, `created_at`, `updated_at` and an owning `user`, and is reachable from the user as `user.goals`.
+- [x] AC2 `status` only allows `planned`, `in_progress` and `done`, labelled "Planned", "In progress" and "Done". A new goal defaults to `planned`. `full_clean()` rejects any other value.
+- [x] AC3 `title` and `description` are both required. `full_clean()` raises a `ValidationError` on `title` when it is empty or longer than 200 characters, and on `description` when it is empty.
+- [x] AC4 `created_at` and `updated_at` are set automatically when a goal is created. Saving the goal again leaves `created_at` unchanged and moves `updated_at` forward.
+- [x] AC5 A user can own several goals. `user.goals` contains only that user's goals. Deleting a user deletes their goals and leaves other users' goals in place.
+- [x] AC6 Goals are ordered newest first by `created_at` by default.
+- [x] AC7 `str(goal)` is its title.
+- [x] AC8 `Goal` is registered in the admin:
   - Its list and add pages load for a superuser.
   - The list shows title, owner, status, created and updated.
   - It can be filtered by status (`?status=done` shows only done goals) and searched by title (`?q=`).
-- [ ] AC9 In the admin, a superuser can create a goal for a chosen owner on the add page. On the change page:
+- [x] AC9 In the admin, a superuser can create a goal for a chosen owner on the add page. On the change page:
   - The owner is read-only, so a POST with a different `user` doesn't reassign the goal.
   - `title`, `description` and `status` stay editable.
   - `created_at` and `updated_at` are shown read-only, not as inputs.
