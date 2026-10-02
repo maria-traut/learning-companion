@@ -27,6 +27,12 @@ def messages_text(response):
     return container.group(1) if container else ""
 
 
+def nav_html(response):
+    nav = re.search(r"<nav[^>]*>(.*?)</nav>", response.content.decode(), re.DOTALL)
+    assert nav
+    return nav.group(1)
+
+
 def main_html(response):
     main = re.search(r"<main[^>]*>(.*?)</main>", response.content.decode(), re.DOTALL)
     assert main
@@ -135,6 +141,18 @@ def test_goal_list_links_to_goal_create_page(client, user):
     main = main_html(client.get("/goals/"))
 
     assert re.search(r'<a href="/goals/new/"[^>]*>\s*New goal\s*</a>', main)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("logged_in", [True, False], ids=["logged-in", "anonymous"])
+def test_nav_shows_goals_link_only_to_logged_in_users(client, user, logged_in):
+    if logged_in:
+        client.force_login(user)
+
+    nav = nav_html(client.get("/"))
+
+    has_goals_link = bool(re.search(r'<a href="/goals/"[^>]*>\s*Goals\s*</a>', nav))
+    assert has_goals_link is logged_in
 
 
 @pytest.mark.django_db
