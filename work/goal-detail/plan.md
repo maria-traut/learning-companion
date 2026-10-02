@@ -57,7 +57,7 @@
 - [x] 13. Owner GET `/goals/<pk>/delete/` returns 200 using `goals/goal_confirm_delete.html` + `base.html`, asks to confirm deleting the goal by title, and has a single POST form — test: `src/apps/goals/tests/test_views.py` — impl: `src/apps/goals/templates/goals/goal_confirm_delete.html` — covers: AC10
 - [x] 14. Delete GET and POST return 404 for another user's goal and a missing pk, and the other user's goal still exists (parametrized `other-user`/`missing` × `get`/`post`) — test: `src/apps/goals/tests/test_views.py` — impl: `GoalDeleteView` uses `OwnGoalMixin` — covers: AC12, AC13
 - [x] 15. Owner POST to `/goals/<pk>/delete/` deletes the goal, redirects to `/goals/` and shows "Goal deleted." — test: `src/apps/goals/tests/test_views.py` — impl: `success_url`, `SuccessMessageMixin` + `success_message` on `GoalDeleteView` — covers: AC11
-- [ ] 16. Detail page links to `/goals/<pk>/edit/` and `/goals/<pk>/delete/` — test: `src/apps/goals/tests/test_views.py` — impl: `goal_detail.html` — covers: AC4
+- [x] 16. Detail page links to `/goals/<pk>/edit/` and `/goals/<pk>/delete/` — test: `src/apps/goals/tests/test_views.py` — impl: `goal_detail.html` — covers: AC4
 
 ## Coverage
 | AC | Steps |

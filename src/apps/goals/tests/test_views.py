@@ -526,3 +526,14 @@ def test_goal_delete_removes_the_goal_and_redirects_to_list_with_message(client,
     assert response.redirect_chain == [("/goals/", 302)]
     assert "Goal deleted." in messages_text(response)
     assert list(Goal.objects.all()) == [other]
+
+
+@pytest.mark.django_db
+def test_goal_detail_links_to_edit_and_delete(client, user):
+    goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    main = main_html(client.get(f"/goals/{goal.pk}/"))
+
+    assert re.search(rf'<a href="/goals/{goal.pk}/edit/"[^>]*>\s*Edit\s*</a>', main)
+    assert re.search(rf'<a href="/goals/{goal.pk}/delete/"[^>]*>\s*Delete\s*</a>', main)
