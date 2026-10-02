@@ -414,3 +414,25 @@ def test_valid_goal_edit_saves_changes_and_redirects_to_detail_with_message(clie
         "Build a small API.",
         Goal.Status.DONE,
     )
+
+
+@pytest.mark.django_db
+def test_forged_owner_and_id_fields_in_edit_cannot_touch_another_users_goal(
+    client, django_user_model, user
+):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    graces_goal = create_goal(grace, "Learn COBOL")
+    adas_goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    response = client.post(
+        f"/goals/{adas_goal.pk}/edit/",
+        {**EDITED, "user": grace.pk, "id": graces_goal.pk, "pk": graces_goal.pk},
+    )
+
+    assert response.status_code == 302
+    adas_goal.refresh_from_db()
+    assert (adas_goal.user, adas_goal.title) == (user, "Learn Flask")
+    graces_goal.refresh_from_db()
+    assert (graces_goal.user, graces_goal.title) == (grace, "Learn COBOL")
+    assert Goal.objects.count() == 2
