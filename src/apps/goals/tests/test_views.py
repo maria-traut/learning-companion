@@ -177,6 +177,24 @@ def test_goal_list_filtered_by_status_shows_only_own_matching_goals_newest_first
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    "query", ["", "?status=", "?status=foo"], ids=["no-param", "empty", "unknown"]
+)
+def test_goal_list_ignores_missing_empty_or_unknown_status(client, user, query):
+    create_goal(user, "Learn Rust", Goal.Status.PLANNED)
+    create_goal(user, "Learn Go", Goal.Status.IN_PROGRESS)
+    create_goal(user, "Learn Elm", Goal.Status.DONE)
+    client.force_login(user)
+
+    response = client.get(f"/goals/{query}")
+
+    assert response.status_code == 200
+    main = main_html(response)
+    for title in ["Learn Rust", "Learn Go", "Learn Elm"]:
+        assert title in main, title
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("logged_in", [True, False], ids=["logged-in", "anonymous"])
 def test_nav_shows_goals_link_only_to_logged_in_users(client, user, logged_in):
     if logged_in:

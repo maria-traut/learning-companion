@@ -43,7 +43,7 @@
   - Asserts: only the matching titles appear, newest first, and grace's goal is absent.
   - Impl: `src/apps/goals/views.py`. `GoalListView.get_queryset` filters on `request.GET["status"]` when present.
   - Covers: AC1, AC2, AC4.
-- [ ] 2. A missing, empty or unknown `status` shows all goals with a 200.
+- [x] 2. A missing, empty or unknown `status` shows all goals with a 200.
   - Test: `test_views.py`, parametrized with ids `no-param` / `empty` / `unknown`, using `?status=foo`. Red because step 1 filters any non-empty value.
   - Impl: `views.py`. Add the `status_filter` helper, which validates against `Goal.Status`, and use it in `get_queryset`.
   - Covers: AC3.
