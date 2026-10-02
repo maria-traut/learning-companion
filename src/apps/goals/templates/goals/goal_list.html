@@ -7,9 +7,9 @@
   <p><a href="{% url 'goals:create' %}">New goal</a></p>
   <nav aria-label="Filter by status">
     <ul>
-      <li><a href="{% url 'goals:list' %}">All</a></li>
+      <li><a href="{% url 'goals:list' %}"{% if not status_filter %} aria-current="page"{% endif %}>All</a></li>
       {% for value, label in status_choices %}
-        <li><a href="{% url 'goals:list' %}?status={{ value }}">{{ label }}</a></li>
+        <li><a href="{% url 'goals:list' %}?status={{ value }}"{% if value == status_filter %} aria-current="page"{% endif %}>{{ label }}</a></li>
       {% endfor %}
     </ul>
   </nav>

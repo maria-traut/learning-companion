@@ -219,6 +219,27 @@ def test_goal_list_shows_status_filter_links(client, user):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("query", "active"),
+    [
+        ("", "All"),
+        ("?status=planned", "Planned"),
+        ("?status=in_progress", "In progress"),
+        ("?status=done", "Done"),
+        ("?status=foo", "All"),
+    ],
+    ids=["no-param", "planned", "in-progress", "done", "unknown"],
+)
+def test_goal_list_marks_only_the_active_status_filter_link(client, user, query, active):
+    client.force_login(user)
+
+    nav = status_filter_html(client.get(f"/goals/{query}"))
+
+    current = re.findall(r'<a [^>]*aria-current="page"[^>]*>\s*(.*?)\s*</a>', nav)
+    assert current == [active]
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("logged_in", [True, False], ids=["logged-in", "anonymous"])
 def test_nav_shows_goals_link_only_to_logged_in_users(client, user, logged_in):
     if logged_in:

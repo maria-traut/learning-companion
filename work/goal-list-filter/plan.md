@@ -51,7 +51,7 @@
   - Test: `test_views.py`.
   - Impl: `views.py` (`get_context_data` adds `status_choices`) and `goals/goal_list.html` (the `<nav>` link row).
   - Covers: AC5.
-- [ ] 4. The active filter link has `aria-current="page"`, and no other link has it.
+- [x] 4. The active filter link has `aria-current="page"`, and no other link has it.
   - Test: `test_views.py`, parametrized over `""` → All, `planned`, `in_progress`, `done` and `foo` → All.
   - Impl: `views.py` (context adds `status_filter`) and `goal_list.html` (conditional `aria-current`).
   - Covers: AC6.
