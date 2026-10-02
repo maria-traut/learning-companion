@@ -60,7 +60,7 @@
   - The existing "No goals yet" test still covers the unfiltered case.
   - Impl: `goal_list.html` (`{% empty %}` branch).
   - Covers: AC7.
-- [ ] 6. Anonymous `GET /goals/?status=done` redirects to login, and `next` carries the full path including the query.
+- [x] 6. Anonymous `GET /goals/?status=done` redirects to login, and `next` carries the full path including the query.
   - This is a characterization test, expected green on the first run (see Design decisions).
   - Test: `test_views.py`.
   - Impl: none.

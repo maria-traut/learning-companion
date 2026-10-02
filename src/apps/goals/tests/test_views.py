@@ -88,6 +88,13 @@ def test_goal_list_redirects_anonymous_visitors_to_login(client):
     assert response.url == "/accounts/login/?next=/goals/"
 
 
+def test_filtered_goal_list_redirects_anonymous_visitors_to_login(client):
+    response = client.get("/goals/?status=done")
+
+    assert response.status_code == 302
+    assert response.url == "/accounts/login/?next=/goals/%3Fstatus%3Ddone"
+
+
 @pytest.mark.django_db
 def test_goal_list_renders_for_logged_in_users(client, user):
     client.force_login(user)
