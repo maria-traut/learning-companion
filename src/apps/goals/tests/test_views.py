@@ -26,6 +26,31 @@ def main_html(response):
     return main.group(1)
 
 
+def tag_attributes(attrs):
+    return {
+        name: value
+        for name, value in re.findall(r'([a-z_-]+)(?:="([^"]*)")?', attrs)
+    }
+
+
+def own_post_form(response):
+    html = response.content.decode()
+    forms = []
+    for attrs, body in re.findall(r"<form([^>]*)>(.*?)</form>", html, re.DOTALL):
+        attributes = tag_attributes(attrs)
+        if attributes.get("method") == "post" and "action" not in attributes:
+            forms.append(body)
+    assert len(forms) == 1
+    return forms[0]
+
+
+def form_field_names(response):
+    names = set(
+        re.findall(r'<(?:input|select|textarea)[^>]*\bname="([^"]+)"', own_post_form(response))
+    )
+    return names - {"csrfmiddlewaretoken"}
+
+
 def create_goal(user, title, status=Goal.Status.PLANNED, day=1):
     goal = Goal.objects.create(
         user=user, title=title, description=DESCRIPTION, status=status
@@ -109,3 +134,16 @@ def test_goal_create_redirects_anonymous_visitors_to_login(client, method):
     assert response.status_code == 302
     assert response.url == "/accounts/login/?next=/goals/new/"
     assert not Goal.objects.exists()
+
+
+@pytest.mark.django_db
+def test_goal_create_page_shows_title_description_and_status_fields(client, user):
+    client.force_login(user)
+
+    response = client.get("/goals/new/")
+
+    assert response.status_code == 200
+    assert "goals/goal_form.html" in template_names(response)
+    assert "base.html" in template_names(response)
+    assert form_field_names(response) == {"title", "description", "status"}
+    assert re.search(r'<option value="planned"[^>]*\bselected\b', own_post_form(response))

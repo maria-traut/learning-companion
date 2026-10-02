@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, ListView
 
+from .forms import GoalForm
 from .models import Goal
 
 
@@ -12,4 +13,5 @@ class GoalListView(LoginRequiredMixin, ListView):
 
 
 class GoalCreateView(LoginRequiredMixin, CreateView):
-    model = Goal
+    form_class = GoalForm
+    template_name = "goals/goal_form.html"
