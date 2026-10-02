@@ -53,6 +53,13 @@ def test_saving_an_existing_user_again_keeps_one_profile(user):
 
 
 @pytest.mark.django_db
+def test_deleting_a_user_deletes_their_profile(user):
+    user.delete()
+
+    assert not Profile.objects.exists()
+
+
+@pytest.mark.django_db
 def test_profile_displays_as_its_users_username(user):
     assert str(user.profile) == "ada"
 
