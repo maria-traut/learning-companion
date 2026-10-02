@@ -436,3 +436,36 @@ def test_forged_owner_and_id_fields_in_edit_cannot_touch_another_users_goal(
     graces_goal.refresh_from_db()
     assert (graces_goal.user, graces_goal.title) == (grace, "Learn COBOL")
     assert Goal.objects.count() == 2
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("changes", "error"),
+    [
+        ({"title": ""}, "This field is required."),
+        ({"description": ""}, "This field is required."),
+        ({"title": "x" * 201}, "at most 200 characters (it has 201)"),
+        (
+            {"status": "archived"},
+            "Select a valid choice. archived is not one of the available choices.",
+        ),
+    ],
+    ids=["missing-title", "missing-description", "title-too-long", "unknown-status"],
+)
+def test_invalid_goal_edit_rerenders_form_with_error_and_leaves_goal_unchanged(
+    client, user, changes, error
+):
+    goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    response = client.post(f"/goals/{goal.pk}/edit/", {**EDITED, **changes})
+
+    assert response.status_code == 200
+    assert "goals/goal_form.html" in template_names(response)
+    assert error in response.content.decode()
+    goal.refresh_from_db()
+    assert (goal.title, goal.description, goal.status) == (
+        "Learn Django",
+        DESCRIPTION,
+        Goal.Status.PLANNED,
+    )
