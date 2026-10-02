@@ -25,3 +25,15 @@ def test_user_goals_contains_exactly_that_users_goals(django_user_model, user):
 
     assert set(user.goals.all()) == {django_goal, sql_goal}
     assert set(grace.goals.all()) == {cobol_goal}
+
+
+@pytest.mark.django_db
+def test_deleting_a_user_deletes_only_their_goals(django_user_model, user):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    adas_goal = Goal.objects.create(user=user, title="Learn Django")
+    graces_goal = Goal.objects.create(user=grace, title="Learn COBOL")
+
+    user.delete()
+
+    assert not Goal.objects.filter(pk=adas_goal.pk).exists()
+    assert Goal.objects.filter(pk=graces_goal.pk).exists()
