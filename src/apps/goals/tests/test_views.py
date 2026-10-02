@@ -482,3 +482,18 @@ def test_goal_delete_redirects_anonymous_visitors_to_login(client, user, method)
     assert response.status_code == 302
     assert response.url == f"/accounts/login/?next={url}"
     assert Goal.objects.filter(pk=goal.pk).exists()
+
+
+@pytest.mark.django_db
+def test_goal_delete_page_asks_to_confirm_deleting_the_goal(client, user):
+    goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    response = client.get(f"/goals/{goal.pk}/delete/")
+
+    assert response.status_code == 200
+    assert "goals/goal_confirm_delete.html" in template_names(response)
+    assert "base.html" in template_names(response)
+    assert re.search(r"Delete\s+“Learn Django”\?", main_html(response))
+    assert form_field_names(response) == set()
+    assert Goal.objects.filter(pk=goal.pk).exists()
