@@ -51,7 +51,7 @@
   - **Step 8:** the timestamp test fails with `AttributeError` (no `created_at` yet). That is the missing behaviour itself, named here so it can be confirmed.
 
 ## Steps
-- [ ] 1. `str(Goal(title="Learn Django"))` is `"Learn Django"`. Test: `src/apps/goals/tests/test_models.py` (plus `tests/__init__.py`). Impl:
+- [x] 1. `str(Goal(title="Learn Django"))` is `"Learn Django"`. Test: `src/apps/goals/tests/test_models.py` (plus `tests/__init__.py`). Impl:
   - `startapp goals` into `src/apps/goals/`; keep only `__init__.py`, `apps.py` (`name = 'apps.goals'`) and `migrations/__init__.py`
   - add `'apps.goals'` to `INSTALLED_APPS`
   - `models.py` (`Goal` with `title`, scaffolded without `__str__` for the red, then `__str__`)
