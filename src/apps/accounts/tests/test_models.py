@@ -54,9 +54,11 @@ def test_saving_an_existing_user_again_keeps_one_profile(user):
 
 @pytest.mark.django_db
 def test_deleting_a_user_deletes_their_profile(user):
+    profile_pk = user.profile.pk
+
     user.delete()
 
-    assert not Profile.objects.exists()
+    assert not Profile.objects.filter(pk=profile_pk).exists()
 
 
 @pytest.mark.django_db
