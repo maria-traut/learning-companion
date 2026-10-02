@@ -497,3 +497,19 @@ def test_goal_delete_page_asks_to_confirm_deleting_the_goal(client, user):
     assert re.search(r"Delete\s+“Learn Django”\?", main_html(response))
     assert form_field_names(response) == set()
     assert Goal.objects.filter(pk=goal.pk).exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+@pytest.mark.parametrize("case", ["other-user", "missing"])
+def test_goal_delete_returns_404_for_another_users_or_missing_goal(
+    client, django_user_model, user, case, method
+):
+    pk = foreign_or_missing_goal_pk(django_user_model, case)
+    client.force_login(user)
+
+    response = getattr(client, method)(f"/goals/{pk}/delete/")
+
+    assert response.status_code == 404
+    if case == "other-user":
+        assert Goal.objects.filter(pk=pk, user__username="grace").exists()

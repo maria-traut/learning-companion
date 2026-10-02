@@ -4,7 +4,6 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .forms import GoalForm
-from .models import Goal
 
 
 class OwnGoalMixin(LoginRequiredMixin):
@@ -36,5 +35,5 @@ class GoalUpdateView(OwnGoalMixin, SuccessMessageMixin, UpdateView):
     success_message = "Goal updated."
 
 
-class GoalDeleteView(LoginRequiredMixin, DeleteView):
-    model = Goal
+class GoalDeleteView(OwnGoalMixin, DeleteView):
+    pass
