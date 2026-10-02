@@ -277,3 +277,18 @@ def test_goal_detail_redirects_anonymous_visitors_to_login(client, user):
 
     assert response.status_code == 302
     assert response.url == f"/accounts/login/?next=/goals/{goal.pk}/"
+
+
+@pytest.mark.django_db
+def test_goal_detail_renders_for_its_owner(client, user):
+    goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    response = client.get(f"/goals/{goal.pk}/")
+
+    assert response.status_code == 200
+    assert "goals/goal_detail.html" in template_names(response)
+    assert "base.html" in template_names(response)
+    assert re.search(
+        r"<title>\s*Learn Django · Learning Companion\s*</title>", response.content.decode()
+    )
