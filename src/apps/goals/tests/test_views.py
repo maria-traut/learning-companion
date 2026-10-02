@@ -85,3 +85,12 @@ def test_goal_list_never_shows_another_users_goals(client, django_user_model, us
 
     assert "Learn Django" in main
     assert "Learn COBOL" not in main
+
+
+@pytest.mark.django_db
+def test_goal_list_shows_empty_state_when_user_has_no_goals(client, user):
+    client.force_login(user)
+
+    main = main_html(client.get("/goals/"))
+
+    assert "No goals yet" in main

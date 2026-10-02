@@ -11,6 +11,8 @@
         · {{ goal.get_status_display }}
         · <time datetime="{{ goal.created_at|date:'c' }}">{{ goal.created_at|date }}</time>
       </li>
+    {% empty %}
+      <li>No goals yet.</li>
     {% endfor %}
   </ul>
 {% endblock %}
