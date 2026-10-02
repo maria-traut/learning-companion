@@ -30,5 +30,6 @@ class GoalDetailView(OwnGoalMixin, DetailView):
     pass
 
 
-class GoalUpdateView(OwnGoalMixin, UpdateView):
+class GoalUpdateView(OwnGoalMixin, SuccessMessageMixin, UpdateView):
     form_class = GoalForm
+    success_message = "Goal updated."

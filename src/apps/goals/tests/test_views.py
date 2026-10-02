@@ -396,3 +396,21 @@ def test_goal_edit_returns_404_for_another_users_or_missing_goal(
     if case == "other-user":
         graces_goal = Goal.objects.get(pk=pk)
         assert (graces_goal.user.username, graces_goal.title) == ("grace", "Learn COBOL")
+
+
+@pytest.mark.django_db
+def test_valid_goal_edit_saves_changes_and_redirects_to_detail_with_message(client, user):
+    goal = create_goal(user, "Learn Django")
+    client.force_login(user)
+
+    response = client.post(f"/goals/{goal.pk}/edit/", EDITED, follow=True)
+
+    assert response.redirect_chain == [(f"/goals/{goal.pk}/", 302)]
+    assert "Goal updated." in messages_text(response)
+    goal.refresh_from_db()
+    assert (goal.user, goal.title, goal.description, goal.status) == (
+        user,
+        "Learn Flask",
+        "Build a small API.",
+        Goal.Status.DONE,
+    )

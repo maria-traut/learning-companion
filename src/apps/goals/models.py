@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 
 class Goal(models.Model):
@@ -22,3 +23,6 @@ class Goal(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("goals:detail", args=[self.pk])
