@@ -1,4 +1,5 @@
 import pytest
+from django.core.exceptions import ValidationError
 
 from apps.goals.models import Goal
 
@@ -54,3 +55,13 @@ def test_new_goal_starts_as_planned_and_displays_status_label(user):
     assert goal.status == "planned"
     goal.status = Goal.Status.IN_PROGRESS
     assert goal.get_status_display() == "In progress"
+
+
+@pytest.mark.django_db
+def test_full_clean_rejects_an_unknown_status(user):
+    goal = Goal(user=user, title="Learn Django", status="archived")
+
+    with pytest.raises(ValidationError) as excinfo:
+        goal.full_clean()
+
+    assert [error.code for error in excinfo.value.error_dict["status"]] == ["invalid_choice"]
