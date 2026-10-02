@@ -489,6 +489,16 @@ def test_profile_edit_without_focus_areas_says_so_and_still_saves(client, user):
 
 
 @pytest.mark.django_db
+def test_profile_edit_with_focus_areas_does_not_claim_there_are_none(client, user):
+    FocusArea.objects.create(name="django")
+    client.force_login(user)
+
+    response = client.get("/accounts/profile/edit/")
+
+    assert "No focus areas available yet" not in main_html(response)
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("url", ["/accounts/profile/", "/accounts/profile/edit/"])
 def test_profile_pages_create_a_missing_profile_on_the_spot(client, user, url):
     user.profile.delete()
