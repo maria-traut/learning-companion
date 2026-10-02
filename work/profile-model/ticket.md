@@ -11,9 +11,9 @@ As a learner, I want a profile with my name, cohort and focus areas attached to 
 - [ ] AC5 A valid sign-up via `/accounts/signup/` creates exactly one profile for the new user, with empty `name`, empty `cohort` and no focus areas; the sign-up form itself is unchanged.
 - [ ] AC6 Creating a user via `create_user` or `create_superuser` (i.e. admin, `createsuperuser`) also creates exactly one profile.
 - [ ] AC7 Saving an existing user again does not create a second profile or fail.
-- [ ] AC8 Users that existed before this change get a profile through a data migration; running its forward step creates a profile for each user without one and leaves existing profiles untouched.
+- [ ] AC8 A data migration creates exactly one profile for every existing user who does not already have one, and leaves existing profiles unchanged.
 - [ ] AC9 `str(profile)` is the user's username.
-- [ ] AC10 `Profile` and `FocusArea` are registered in the admin: their changelist and add pages return 200 for a superuser, and the profile change page lets the admin edit `name`, `cohort` and `focus_areas`.
+- [ ] AC10 `Profile` and `FocusArea` are registered in the admin. Their list and add pages load for a superuser. On a `Profile` admin page, a superuser can edit `name`, `cohort` and `focus_areas`.
 
 ## Out of scope
 - Profile page where a user views/edits their own profile (#4).
