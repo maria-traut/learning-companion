@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from apps.accounts.models import FocusArea
+from apps.accounts.models import FocusArea, Profile
 
 PASSWORD = "correct-horse-battery-9"
 
@@ -37,7 +37,6 @@ def test_superuser_can_edit_name_cohort_and_focus_areas_of_a_profile(
     response = admin_client.post(
         url,
         {
-            "user": ada.pk,
             "name": "Ada Lovelace",
             "cohort": "Web Dev Berlin 2026-03",
             "focus_areas": [django_area.pk, sql_area.pk],
@@ -54,6 +53,30 @@ def test_superuser_can_edit_name_cohort_and_focus_areas_of_a_profile(
 
 
 @pytest.mark.django_db
+def test_profile_user_is_read_only_on_the_admin_change_page(admin_client, django_user_model):
+    ada = django_user_model.objects.create_user(username="ada", password=PASSWORD)
+    bob = django_user_model.objects.create_user(username="bob", password=PASSWORD)
+    bob.profile.delete()
+    url = f"/admin/accounts/profile/{ada.profile.pk}/change/"
+
+    page = admin_client.get(url).content.decode()
+    response = admin_client.post(url, {"user": bob.pk, "name": "Ada Lovelace", "cohort": ""})
+
+    assert not re.search(r'name="user"', page)
+    assert response.status_code == 302
+    profile = Profile.objects.get(pk=ada.profile.pk)
+    assert profile.user == ada
+    assert profile.name == "Ada Lovelace"
+    assert not Profile.objects.filter(user=bob).exists()
+
+
+def test_profile_user_is_selectable_on_the_admin_add_page(admin_client):
+    page = admin_client.get("/admin/accounts/profile/add/").content.decode()
+
+    assert re.search(r'<select[^>]*name="user"', page)
+
+
+@pytest.mark.django_db
 def test_superuser_can_save_a_profile_with_name_cohort_and_focus_areas_left_empty(
     admin_client, django_user_model
 ):
@@ -65,7 +88,7 @@ def test_superuser_can_save_a_profile_with_name_cohort_and_focus_areas_left_empt
 
     response = admin_client.post(
         f"/admin/accounts/profile/{ada.profile.pk}/change/",
-        {"user": ada.pk, "name": "", "cohort": ""},
+        {"name": "", "cohort": ""},
     )
 
     assert response.status_code == 302
