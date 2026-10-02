@@ -14,7 +14,7 @@ the rest alone.
 - [x] base-layout: #1 Base layout and home page: `src/templates/base.html` with Pico.css from CDN, a nav bar, and a home page at `/` rendered from it — see work/base-layout/review.md
 ## Authentication and profile
 - [x] auth: #2 Sign up, log in and log out with Django's built-in auth views, using the base layout; nav shows login state (after base layout ships) — see work/auth/review.md
-- [ ] #3 Profile model linked one-to-one to the user with `name`, `cohort` and a list of `focus_area` tags, created automatically on sign-up and registered in the admin (after sign up/log in ships)
+- [~] profile-model: #3 Profile model linked one-to-one to the user with `name`, `cohort` and a list of `focus_area` tags, created automatically on sign-up and registered in the admin (after sign up/log in ships)
 - [ ] #4 Profile page where a logged-in user views and edits only their own profile; anonymous users are redirected to login (after profile model ships)
 ## Goals
 - [ ] #5 Goal model (`title`, `description`, `status` planned/in-progress/done, `created_at`, `updated_at`) owned by a user, with migration and admin (after sign up/log in ships)
