@@ -16,7 +16,7 @@
       </ul>
       <ul>
         {% if user.is_authenticated %}
-          <li>{{ user.get_username }}</li>
+          <li><a href="{% url 'accounts:profile' %}">{{ user.get_username }}</a></li>
           <li>
             <form method="post" action="{% url 'accounts:logout' %}">
               {% csrf_token %}
