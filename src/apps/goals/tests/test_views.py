@@ -377,3 +377,22 @@ def test_goal_edit_page_shows_form_prefilled_with_the_goal(client, user):
     assert re.search(r'<input[^>]*name="title"[^>]*value="Learn Django"', form)
     assert re.search(rf"<textarea[^>]*>\s*{re.escape(DESCRIPTION)}</textarea>", form)
     assert re.search(r'<option value="in_progress"[^>]*\bselected\b', form)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["get", "post"])
+@pytest.mark.parametrize("case", ["other-user", "missing"])
+def test_goal_edit_returns_404_for_another_users_or_missing_goal(
+    client, django_user_model, user, case, method
+):
+    pk = foreign_or_missing_goal_pk(django_user_model, case)
+    client.force_login(user)
+    url = f"/goals/{pk}/edit/"
+
+    response = client.post(url, EDITED) if method == "post" else client.get(url)
+
+    assert response.status_code == 404
+    assert not Goal.objects.filter(title=EDITED["title"]).exists()
+    if case == "other-user":
+        graces_goal = Goal.objects.get(pk=pk)
+        assert (graces_goal.user.username, graces_goal.title) == ("grace", "Learn COBOL")
