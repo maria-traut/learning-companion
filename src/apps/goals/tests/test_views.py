@@ -20,6 +20,13 @@ def template_names(response):
     return [template.name for template in response.templates]
 
 
+def messages_text(response):
+    container = re.search(
+        r'<section id="messages"[^>]*>(.*?)</section>', response.content.decode(), re.DOTALL
+    )
+    return container.group(1) if container else ""
+
+
 def main_html(response):
     main = re.search(r"<main[^>]*>(.*?)</main>", response.content.decode(), re.DOTALL)
     assert main
@@ -147,3 +154,24 @@ def test_goal_create_page_shows_title_description_and_status_fields(client, user
     assert "base.html" in template_names(response)
     assert form_field_names(response) == {"title", "description", "status"}
     assert re.search(r'<option value="planned"[^>]*\bselected\b', own_post_form(response))
+
+
+@pytest.mark.django_db
+def test_valid_goal_create_saves_goal_for_user_and_redirects_with_message(client, user):
+    client.force_login(user)
+
+    response = client.post(
+        "/goals/new/",
+        {"title": "Learn Django", "description": DESCRIPTION, "status": "in_progress"},
+        follow=True,
+    )
+
+    assert response.redirect_chain == [("/goals/", 302)]
+    assert "Goal created." in messages_text(response)
+    goal = Goal.objects.get()
+    assert (goal.user, goal.title, goal.description, goal.status) == (
+        user,
+        "Learn Django",
+        DESCRIPTION,
+        Goal.Status.IN_PROGRESS,
+    )
