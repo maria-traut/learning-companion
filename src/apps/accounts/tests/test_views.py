@@ -253,6 +253,21 @@ def test_nav_shows_username_and_logout_form_to_logged_in_users(client, user):
 
 
 @pytest.mark.django_db
+def test_nav_username_links_logged_in_users_to_their_profile(client, user):
+    client.force_login(user)
+
+    nav = nav_html(client.get("/"))
+
+    assert re.search(r'<a href="/accounts/profile/"[^>]*>\s*ada\s*</a>', nav)
+
+
+def test_nav_has_no_profile_link_for_anonymous_visitors(client):
+    nav = nav_html(client.get("/"))
+
+    assert "/accounts/profile/" not in nav
+
+
+@pytest.mark.django_db
 def test_logged_in_user_is_redirected_home_from_login_page(client, user):
     client.force_login(user)
 
