@@ -89,3 +89,48 @@ def test_superuser_can_add_a_goal_for_a_chosen_owner(admin_client, user):
         DESCRIPTION,
         "in_progress",
     )
+
+
+@pytest.mark.django_db
+def test_crafted_post_cannot_change_a_goals_owner(admin_client, django_user_model, user):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    goal = Goal.objects.create(user=user, title="Learn Django", description=DESCRIPTION)
+    url = f"/admin/goals/goal/{goal.pk}/change/"
+
+    page = admin_client.get(url).content.decode()
+    response = admin_client.post(
+        url,
+        {
+            "user": grace.pk,
+            "title": "Learn Django properly",
+            "description": "Build a small project.",
+            "status": "done",
+        },
+    )
+
+    assert not re.search(r'name="user"', page)
+    assert response.status_code == 302
+    stored = Goal.objects.get(pk=goal.pk)
+    assert stored.user == user
+    assert (stored.title, stored.description, stored.status) == (
+        "Learn Django properly",
+        "Build a small project.",
+        "done",
+    )
+
+
+@pytest.mark.django_db
+def test_goal_timestamps_are_shown_read_only_in_the_admin(admin_client, user):
+    goal = Goal.objects.create(user=user, title="Learn Django", description=DESCRIPTION)
+
+    change_page = admin_client.get(f"/admin/goals/goal/{goal.pk}/change/").content.decode()
+    add_page = admin_client.get("/admin/goals/goal/add/").content.decode()
+
+    for field in ("created_at", "updated_at"):
+        assert re.search(
+            rf'class="[^"]*\bfield-{field}\b[^"]*">.*?<div class="readonly">',
+            change_page,
+            re.DOTALL,
+        ), field
+        assert not re.search(rf'name="{field}"', change_page)
+        assert not re.search(rf'name="{field}"', add_page)

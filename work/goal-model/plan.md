@@ -71,7 +71,7 @@
 - [x] 12. The changelist shows a "By status" filter with Planned, In progress and Done. The requirement is that `?status=done` lists only the done goals (`response.context["cl"].result_list`). As an extra, non-normative check, the filter's own `Done` link (`?status__exact=done`) gives the same result. Test: `test_admin.py`. Impl: `GoalAdmin.list_filter`. Covers: AC8.
 - [x] 13. `?q=django` lists only the goals whose title contains "django" (case-insensitive). Test: `test_admin.py`. Impl: `GoalAdmin.search_fields`. Covers: AC8.
 - [x] 14. *(characterization)* The add page has a `<select name="user">`. Posting `user`, `title`, `description` and `status` redirects to `/admin/goals/goal/` and creates exactly one goal with that owner and those values. Test: `test_admin.py`. Impl: none expected. Verify with a temporary `exclude = ["user"]` on `GoalAdmin`. Covers: AC9.
-- [ ] 15. On a goal's change page:
+- [x] 15. On a goal's change page:
   - there is no `name="user"` input
   - a crafted POST with `user=<grace.pk>` plus a new title, description and status redirects. Reloaded from the database (`Goal.objects.get(pk=...)`), the goal's owner is still ada, and the new title, description and status are saved. Both halves are tested: the field isn't rendered, and the stored owner doesn't change
   - there are no `created_at`/`updated_at` inputs; both are shown as `div.readonly` inside `field-created_at` / `field-updated_at`
