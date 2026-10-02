@@ -52,16 +52,32 @@ def profile_values(response):
     ]
 
 
+def tag_attributes(attrs):
+    return {
+        name: value
+        for name, value in re.findall(r'([a-z_-]+)(?:="([^"]*)")?', attrs)
+    }
+
+
 def form_field_names(response):
-    form = re.search(r'<form method="post">(.*?)</form>', response.content.decode(), re.DOTALL)
-    assert form
-    names = set(re.findall(r'<(?:input|select|textarea)[^>]*name="([^"]+)"', form.group(1)))
+    html = response.content.decode()
+    forms = []
+    for attrs, body in re.findall(r"<form([^>]*)>(.*?)</form>", html, re.DOTALL):
+        attributes = tag_attributes(attrs)
+        if attributes.get("method") == "post" and "action" not in attributes:
+            forms.append(body)
+    assert len(forms) == 1
+    names = set(re.findall(r'<(?:input|select|textarea)[^>]*\bname="([^"]+)"', forms[0]))
     return names - {"csrfmiddlewaretoken"}
 
 
 def focus_area_checkboxes(html):
-    tags = re.findall(r'<input type="checkbox" name="focus_areas" value="(\d+)"([^>]*)>', html)
-    return {int(pk): "checked" in attrs for pk, attrs in tags}
+    checkboxes = {}
+    for attrs in re.findall(r"<input([^>]*)>", html):
+        attributes = tag_attributes(attrs)
+        if attributes.get("type") == "checkbox" and attributes.get("name") == "focus_areas":
+            checkboxes[int(attributes["value"])] = "checked" in attributes
+    return checkboxes
 
 
 def fill_profile(user, name, cohort, focus_area_names):
