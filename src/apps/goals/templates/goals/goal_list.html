@@ -5,6 +5,14 @@
 {% block content %}
   <h1>Goals</h1>
   <p><a href="{% url 'goals:create' %}">New goal</a></p>
+  <nav aria-label="Filter by status">
+    <ul>
+      <li><a href="{% url 'goals:list' %}"{% if not status_filter %} aria-current="page"{% endif %}>All</a></li>
+      {% for value, label in status_choices %}
+        <li><a href="{% url 'goals:list' %}?status={{ value }}"{% if value == status_filter %} aria-current="page"{% endif %}>{{ label }}</a></li>
+      {% endfor %}
+    </ul>
+  </nav>
   <ul>
     {% for goal in goal_list %}
       <li>
@@ -13,7 +21,11 @@
         · <time datetime="{{ goal.created_at|date:'c' }}">{{ goal.created_at|date }}</time>
       </li>
     {% empty %}
-      <li>No goals yet.</li>
+      {% if status_filter %}
+        <li>No goals with status {{ status_filter.label }}.</li>
+      {% else %}
+        <li>No goals yet.</li>
+      {% endif %}
     {% endfor %}
   </ul>
 {% endblock %}
