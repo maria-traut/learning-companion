@@ -310,6 +310,16 @@ def test_profile_page_shows_the_users_own_details(client, user):
 
 
 @pytest.mark.django_db
+def test_empty_profile_page_shows_placeholders(client, user):
+    client.force_login(user)
+
+    content = main_html(client.get("/accounts/profile/"))
+
+    assert content.count("Not set yet") == 2
+    assert "No focus areas yet" in content
+
+
+@pytest.mark.django_db
 def test_profile_page_shows_only_the_logged_in_users_data(client, django_user_model, user):
     grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
     fill_profile(user, "Ada Lovelace", "Berlin 2026-03", ["django"])
