@@ -461,6 +461,19 @@ def test_invalid_profile_edit_rerenders_form_with_error_and_saves_nothing(
 
 
 @pytest.mark.django_db
+def test_profile_edit_without_focus_areas_says_so_and_still_saves(client, user):
+    client.force_login(user)
+
+    page = client.get("/accounts/profile/edit/")
+    response = client.post("/accounts/profile/edit/", {"name": "Ada", "cohort": "Berlin"})
+
+    assert "No focus areas available yet" in main_html(page)
+    assert response.status_code == 302
+    profile = Profile.objects.get(user=user)
+    assert (profile.name, profile.cohort) == ("Ada", "Berlin")
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_profile_edit_page_redirects_anonymous_visitors_to_login(client, user, method):
     if method == "post":
