@@ -72,3 +72,16 @@ def test_goal_list_shows_title_status_and_created_date_newest_first(client, user
         assert item, goal.title
         assert label in item.group(1)
         assert date_format(localtime(goal.created_at)) in item.group(1)
+
+
+@pytest.mark.django_db
+def test_goal_list_never_shows_another_users_goals(client, django_user_model, user):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    create_goal(user, "Learn Django")
+    create_goal(grace, "Learn COBOL")
+    client.force_login(user)
+
+    main = main_html(client.get("/goals/"))
+
+    assert "Learn Django" in main
+    assert "Learn COBOL" not in main
