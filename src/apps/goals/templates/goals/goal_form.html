@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}New goal · Learning Companion{% endblock %}
+
+{% block content %}
+  <h1>New goal</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit">Save</button>
+  </form>
+{% endblock %}

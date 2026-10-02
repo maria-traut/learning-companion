@@ -1,0 +1,25 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView
+
+from .forms import GoalForm
+from .models import Goal
+
+
+class GoalListView(LoginRequiredMixin, ListView):
+    model = Goal
+
+    def get_queryset(self):
+        return self.request.user.goals.all()
+
+
+class GoalCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    form_class = GoalForm
+    template_name = "goals/goal_form.html"
+    success_url = reverse_lazy("goals:list")
+    success_message = "Goal created."
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)

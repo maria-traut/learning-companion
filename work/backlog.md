@@ -18,7 +18,7 @@ the rest alone.
 - [x] profile-page: #4 Profile page where a logged-in user views and edits only their own profile; anonymous users are redirected to login (after profile model ships) — see work/profile-page/review.md
 ## Goals
 - [x] goal-model: #5 Goal model (`title`, `description`, `status` planned/in-progress/done, `created_at`, `updated_at`) owned by a user, with migration and admin (after sign up/log in ships) — see work/goal-model/review.md
-- [ ] #6 Goal list and create views, scoped so a user only sees and creates their own goals (after goal model ships)
+- [x] goal-list-create: #6 Goal list and create views, scoped so a user only sees and creates their own goals (after goal model ships) — see work/goal-list-create/review.md
 - [ ] #7 Goal detail, edit and delete views, returning 404 for other users' goals (after goal list/create ships)
 - [ ] #8 Filter the goal list by `status` via a query parameter (after goal list/create ships)
 ## Learning sessions
