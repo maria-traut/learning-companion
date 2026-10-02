@@ -37,3 +37,20 @@ def test_deleting_a_user_deletes_only_their_goals(django_user_model, user):
 
     assert not Goal.objects.filter(pk=adas_goal.pk).exists()
     assert Goal.objects.filter(pk=graces_goal.pk).exists()
+
+
+def test_goal_status_has_three_labelled_choices():
+    assert Goal.Status.choices == [
+        ("planned", "Planned"),
+        ("in_progress", "In progress"),
+        ("done", "Done"),
+    ]
+
+
+@pytest.mark.django_db
+def test_new_goal_starts_as_planned_and_displays_status_label(user):
+    goal = Goal.objects.create(user=user, title="Learn Django")
+
+    assert goal.status == "planned"
+    goal.status = Goal.Status.IN_PROGRESS
+    assert goal.get_status_display() == "In progress"
