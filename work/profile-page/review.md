@@ -1,5 +1,52 @@
 # Review: profile-page
-## Verdict: FAIL
+## Verdict: PASS
+
+Round 2, after the round-1 findings were implemented as plan steps 16–20.
+- The suite is green (79 passed). `ruff check .`, `manage.py check` and `makemigrations --check` are clean.
+- Neither reviewer found any high- or medium-severity issue.
+- Every acceptance criterion is covered by a test that was shown to fail when the behaviour breaks.
+- The code reviewer confirmed all five round-1 findings turned into steps are fixed.
+- Production code is unchanged since round 1: `git diff e03cf0f..HEAD -- src` touches only `src/apps/accounts/tests/test_views.py`.
+
+## Acceptance criteria
+- AC1: covered by `test_profile_page_redirects_anonymous_visitors_to_login` and `test_profile_edit_page_redirects_anonymous_visitors_to_login` (get, post). PASS
+- AC2: covered by `test_profile_page_shows_the_users_own_details` (exact `<dl>` values) and `test_empty_profile_page_shows_placeholders`. PASS
+- AC3: covered by `test_profile_page_shows_only_the_logged_in_users_data`. It checks exact `<dl>` values per user, and that the other user's name and cohort appear nowhere in `<main>`. PASS
+- AC4: covered by `test_profile_page_links_to_the_edit_page`. PASS
+- AC5: covered by `test_profile_edit_form_is_prefilled_with_a_checkbox_per_focus_area`. PASS
+- AC6: PASS. Covered by these three tests:
+  - `test_valid_profile_edit_saves_replaces_focus_areas_and_redirects`
+  - `test_profile_edit_with_no_focus_areas_ticked_clears_them`
+  - `test_profile_edit_shows_profile_updated_message_on_profile_page`
+- AC7: covered by `test_profile_edit_form_has_exactly_name_cohort_and_focus_areas` and `test_forged_owner_and_extra_fields_cannot_touch_another_profile`. PASS
+- AC8: covered by `test_invalid_profile_edit_rerenders_form_with_error_and_saves_nothing` (3 cases). PASS
+- AC9: covered by `test_profile_edit_without_focus_areas_says_so_and_still_saves` and `test_profile_edit_with_focus_areas_does_not_claim_there_are_none`. It is now pinned both ways. PASS
+- AC10: covered by `test_profile_pages_create_a_missing_profile_on_the_spot` (2 URLs). PASS
+- AC11: covered by `test_nav_username_links_logged_in_users_to_their_profile` and `test_nav_has_no_profile_link_for_anonymous_visitors`. PASS
+
+## Findings
+Code review found 0 high, 0 medium and 5 low. Security review found 0 high, 0 medium and no new findings; it re-checked access control, mass assignment, CSRF, XSS, open redirect, authn and secrets.
+
+All of the lows below concern how strict the test helpers are. None of them makes a current test wrong or able to pass vacuously, so they are left as follow-ups and do not block release:
+- [low] `src/apps/accounts/tests/test_views.py:58`: `tag_attributes` only handles lowercase, digit-free names with double-quoted values. Single quotes or uppercase would mis-parse, though Django's widget output never produces them. Recommendation: widen the pattern or use the stdlib `html.parser`, ideally together with moving the helpers into a `conftest.py` (the follow-up deferred from #3).
+- [low] `src/apps/accounts/tests/test_views.py:50`: `profile_values` matches values by position, not by their `<dt>` label. Recommendation: return label/value pairs.
+- [low] `src/apps/accounts/tests/test_views.py:404-405`: the AC5 pre-fill regexes for `name` and `cohort` still depend on attribute order, which is inconsistent with the step-19 helpers. Recommendation: read those inputs through `tag_attributes`.
+- [low] `src/apps/accounts/tests/test_views.py:550`: the step-16 absence test doesn't also check for 200 or the edit template. Recommendation: add both so the absence is tied to a real edit page.
+- [low] `src/apps/accounts/tests/test_views.py:70`: `\bname="` also matches `data-name="..."`. That would fail loudly, not pass falsely. Recommendation: use a stricter lookbehind or `tag_attributes`.
+
+Carried over from round 1 and still accepted, with both reviewers agreeing:
+- the sign-up test refactor, recorded for the audit trail
+- the GET-time `get_or_create`, which AC10 requires
+
+Also carried over: the pre-existing `SECRET_KEY` fallback in `src/config/settings.py:31` is recommended as a separate ticket before #20/#21.
+
+## Reviewed
+commit 8a16f32, 2026-10-02
+
+---
+
+## Round 1 (history)
+### Verdict: FAIL
 
 The checks are clean:
 - the suite is green (77 passed)
@@ -8,7 +55,7 @@ The checks are clean:
 
 The verdict is FAIL because AC9 is only partly covered, the same standard as #3's round 1. The test pins that the notice appears when no focus areas exist. Nothing pins that it is absent when they do exist. Inverting or removing the `{% if %}` in `profile_form.html:7`, so the notice always shows, would leave the suite green, even though the page would then wrongly claim there are no focus areas.
 
-## Acceptance criteria
+### Acceptance criteria
 - **AC1**: PASS. Covered by `test_profile_page_redirects_anonymous_visitors_to_login` and `test_profile_edit_page_redirects_anonymous_visitors_to_login` (`get` and `post` cases).
 - **AC2**: PASS. Covered by `test_profile_page_shows_the_users_own_details`. Its checks are broad substring checks; see the low finding.
 - **AC3**: PASS. Covered by `test_profile_page_shows_only_the_logged_in_users_data`, which was also checked with a temporary break.
@@ -24,7 +71,7 @@ The verdict is FAIL because AC9 is only partly covered, the same standard as #3'
 - **AC10**: PASS. Covered by `test_profile_pages_create_a_missing_profile_on_the_spot` (2 URLs).
 - **AC11**: PASS. Covered by `test_nav_username_links_logged_in_users_to_their_profile` and `test_nav_has_no_profile_link_for_anonymous_visitors`.
 
-## Findings
+### Findings
 Code review (`code-reviewer`) found 0 high, 1 medium and 5 low. Security review (`security-reviewer`) found 0 high, 0 medium and 1 low. The security review found no problems in any of these areas:
 - IDOR (both URLs are id-free, and `get_object` never reads request data)
 - mass assignment (explicit form fields, forged `user`/`pk`/`id` ignored)
@@ -45,5 +92,5 @@ Recorded and deliberately not turned into steps:
 - [low] (security) `src/apps/accounts/views.py:45`: a GET can write a missing profile row through `get_or_create`. This is accepted, because AC10 requires it. It only ever creates the requester's own empty row, and `get_or_create` handles concurrent inserts.
 - [info] (security, pre-existing, not part of this diff) `src/config/settings.py:31`: `SECRET_KEY` falls back to `'django-insecure-dev-only-change-me'`. Recommendation for a separate ticket: require `SECRET_KEY` outside development, for example before the Docker/CI tickets #20 and #21.
 
-## Reviewed
+### Reviewed
 commit e03cf0f, 2026-10-02
