@@ -65,3 +65,12 @@
 2026-10-03T10:36:31+02:00 WRITE src/apps/learning_sessions/models.py
 2026-10-03T10:36:52+02:00 TESTS red (after src/apps/learning_sessions/models.py)
 2026-10-03T10:37:20+02:00 WRITE work/learning-session-model/plan.md
+2026-10-03T10:37:52+02:00 WRITE src/apps/learning_sessions/tests/test_models.py
+2026-10-03T10:38:13+02:00 TESTS red (after src/apps/learning_sessions/tests/test_models.py)
+2026-10-03T10:38:13+02:00 WRITE src/apps/learning_sessions/tests/test_models.py
+2026-10-03T10:38:34+02:00 TESTS red (after src/apps/learning_sessions/tests/test_models.py)
+2026-10-03T10:38:45+02:00 WRITE src/apps/learning_sessions/models.py
+2026-10-03T10:38:45+02:00 TESTS red (after src/apps/learning_sessions/models.py)
+2026-10-03T10:38:45+02:00 WRITE src/apps/learning_sessions/models.py
+2026-10-03T10:39:06+02:00 TESTS green (after src/apps/learning_sessions/models.py)
+2026-10-03T10:39:35+02:00 WRITE work/learning-session-model/plan.md

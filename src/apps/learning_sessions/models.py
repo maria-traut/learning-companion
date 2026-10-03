@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 from apps.goals.models import Goal
 
@@ -16,7 +17,7 @@ class Tag(models.Model):
 
 class LearningSession(models.Model):
     goal = models.ForeignKey(Goal, on_delete=models.CASCADE, related_name="sessions")
-    date = models.DateField()
+    date = models.DateField(default=timezone.localdate)
     duration_minutes = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     notes = models.TextField(blank=True)
 

@@ -2,6 +2,7 @@ from datetime import date
 
 import pytest
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apps.goals.models import Goal
 from apps.learning_sessions.models import LearningSession, Tag
@@ -112,3 +113,10 @@ def test_full_clean_accepts_empty_notes(goal):
     session = LearningSession(goal=goal, date=date(2026, 9, 1), duration_minutes=30, notes="")
 
     session.full_clean()
+
+
+@pytest.mark.django_db
+def test_session_date_defaults_to_today(goal):
+    session = LearningSession.objects.create(goal=goal, duration_minutes=30)
+
+    assert session.date == timezone.localdate()
