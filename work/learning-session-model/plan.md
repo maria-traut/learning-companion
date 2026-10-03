@@ -44,7 +44,7 @@
   - `filter_horizontal = ["tags"]` is optional and only for usability.
 - **Admin, `TagAdmin`:** `list_display = ["name"]`, `search_fields = ["name"]`.
 - **One schema migration while the ticket is open, following #5 (goal-model).** `0001_initial` is regenerated (delete it, then run `makemigrations learning_sessions`) whenever a step changes the schema. Read "migration 0002" and "+ migration" in the steps below in that sense.
-- **First-model scaffolding, following #5.** A bare model is scaffolded before the first test of each new model (`Tag` in step 2, `LearningSession` in step 5). The test then fails on its assertion instead of on an import error.
+- **First-model scaffolding, following #5.** A bare model is scaffolded before the first test of each new model (`Tag` in step 2, `LearningSession` in step 5). The test then fails on its assertion instead of on an import error. `LearningSession` starts with only `goal`, `date` and `duration_minutes`. Each other field is added in the step that tests it: `notes` in step 8, `tags` in step 11, `created_at` in step 12.
 - **Three guard tests may pass on their first run:**
   - Step 13 (deleting) passes because `CASCADE` and M2M cleanup already exist.
   - Step 14 (no pending migrations) passes as soon as the migrations are kept up to date.
@@ -56,7 +56,7 @@
 - [x] 2. A `Tag` displays as its name (unsaved instance, no DB). Test: `tests/test_models.py`. Impl: `models.py` (`Tag.name`, `__str__`), plus migration `0001_initial`. Covers AC2.
 - [x] 3. `Tag.full_clean` rejects an empty name, a name over 50 characters, and a duplicate name; it accepts 50 characters. Test: `tests/test_models.py` (parametrized, plus a duplicate case). Impl: `max_length=50`, `unique=True`, and a migration if needed. Covers AC2.
 - [x] 4. Tags list in name order. Test: `tests/test_models.py`. Impl: `Tag.Meta.ordering`, plus a migration. Covers AC2.
-- [ ] 5. A session displays as `"<goal title> – <YYYY-MM-DD> (<n> min)"`, using an unsaved instance with an unsaved goal. Test: `tests/test_models.py`. Impl: the `LearningSession` model (`goal`, `date`, `duration_minutes`, `notes`, `tags`, `created_at`), `__str__`, and migration `0002`. Covers AC3 and AC10.
+- [x] 5. A session displays as `"<goal title> – <YYYY-MM-DD> (<n> min)"`, using an unsaved instance with an unsaved goal. Test: `tests/test_models.py`. Impl: the `LearningSession` model (`goal`, `date`, `duration_minutes`, `notes`, `tags`, `created_at`), `__str__`, and migration `0002`. Covers AC3 and AC10.
 - [ ] 6. `goal.sessions` returns that goal's sessions. Test: `tests/test_models.py`. Impl: `related_name="sessions"`, if step 5 didn't already set it. Covers AC3.
 - [ ] 7. `full_clean` rejects `duration_minutes` of 0 and -5 with error key `duration_minutes`, and accepts 1. Test: `tests/test_models.py` (parametrized). Impl: `MinValueValidator(1)`, plus a migration. Covers AC5.
 - [ ] 8. `full_clean` reports errors for both `goal` and `date` when they are missing, and accepts `notes=""`. Test: `tests/test_models.py`. Impl: `notes` gets `blank=True`, plus a migration. Covers AC6 and AC3.

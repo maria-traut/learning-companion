@@ -1,7 +1,10 @@
+from datetime import date
+
 import pytest
 from django.core.exceptions import ValidationError
 
-from apps.learning_sessions.models import Tag
+from apps.goals.models import Goal
+from apps.learning_sessions.models import LearningSession, Tag
 
 
 def test_tag_displays_as_its_name():
@@ -45,3 +48,11 @@ def test_tags_are_listed_by_name():
     python = Tag.objects.create(name="python")
 
     assert list(Tag.objects.all()) == [django, orm, python]
+
+
+def test_session_displays_as_goal_title_date_and_duration():
+    session = LearningSession(
+        goal=Goal(title="Learn Django"), date=date(2026, 9, 7), duration_minutes=45
+    )
+
+    assert str(session) == "Learn Django – 2026-09-07 (45 min)"
