@@ -180,3 +180,47 @@ def test_sessions_are_listed_newest_date_first_then_newest_created_first(goal):
         older_day,
         same_day_early,
     ]
+
+
+@pytest.mark.django_db
+def test_deleting_a_goal_deletes_only_its_sessions(user, goal):
+    other_goal = Goal.objects.create(user=user, title="Learn SQL", description=DESCRIPTION)
+    session = LearningSession.objects.create(goal=goal, date=date(2026, 9, 1), duration_minutes=30)
+    other_session = LearningSession.objects.create(
+        goal=other_goal, date=date(2026, 9, 1), duration_minutes=30
+    )
+
+    goal.delete()
+
+    assert not LearningSession.objects.filter(pk=session.pk).exists()
+    assert LearningSession.objects.filter(pk=other_session.pk).exists()
+
+
+@pytest.mark.django_db
+def test_deleting_a_tag_removes_it_from_sessions_but_keeps_them(goal):
+    django = Tag.objects.create(name="django")
+    orm = Tag.objects.create(name="orm")
+    session = LearningSession.objects.create(goal=goal, date=date(2026, 9, 1), duration_minutes=30)
+    session.tags.add(django, orm)
+
+    django.delete()
+
+    assert LearningSession.objects.filter(pk=session.pk).exists()
+    assert set(session.tags.all()) == {orm}
+
+
+@pytest.mark.django_db
+def test_deleting_a_user_deletes_only_their_goals_sessions(django_user_model, user, goal):
+    grace = django_user_model.objects.create_user(username="grace", password=PASSWORD)
+    graces_goal = Goal.objects.create(user=grace, title="Learn COBOL", description=DESCRIPTION)
+    adas_session = LearningSession.objects.create(
+        goal=goal, date=date(2026, 9, 1), duration_minutes=30
+    )
+    graces_session = LearningSession.objects.create(
+        goal=graces_goal, date=date(2026, 9, 1), duration_minutes=30
+    )
+
+    user.delete()
+
+    assert not LearningSession.objects.filter(pk=adas_session.pk).exists()
+    assert LearningSession.objects.filter(pk=graces_session.pk).exists()
