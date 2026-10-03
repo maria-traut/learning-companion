@@ -50,7 +50,7 @@
   - `tdd-implement` records each as a guard test that passed on first run. It must not change working code just to make these tests fail first.
 
 ## Steps
-- [ ] 1. The app `apps.learning_sessions` is installed (`django.apps.apps.is_installed`). Test: `src/apps/learning_sessions/tests/test_apps.py`. Impl: `startapp`, `apps.py` (`name`), `INSTALLED_APPS` in `src/config/settings.py`, and a `tests/__init__.py`. Covers AC1.
+- [x] 1. The app `apps.learning_sessions` is installed (`django.apps.apps.is_installed`). Test: `src/apps/learning_sessions/tests/test_apps.py`. Impl: `startapp`, `apps.py` (`name`), `INSTALLED_APPS` in `src/config/settings.py`, and a `tests/__init__.py`. Covers AC1.
 - [ ] 2. A `Tag` displays as its name (unsaved instance, no DB). Test: `tests/test_models.py`. Impl: `models.py` (`Tag.name`, `__str__`), plus migration `0001_initial`. Covers AC2.
 - [ ] 3. `Tag.full_clean` rejects an empty name, a name over 50 characters, and a duplicate name; it accepts 50 characters. Test: `tests/test_models.py` (parametrized, plus a duplicate case). Impl: `max_length=50`, `unique=True`, and a migration if needed. Covers AC2.
 - [ ] 4. Tags list in name order. Test: `tests/test_models.py`. Impl: `Tag.Meta.ordering`, plus a migration. Covers AC2.

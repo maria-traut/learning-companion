@@ -1,0 +1,18 @@
+2026-10-03T09:41:11+02:00 WRITE work/learning-session-model/ticket.md
+2026-10-03T10:07:42+02:00 WRITE work/learning-session-model/ticket.md
+2026-10-03T10:07:42+02:00 WRITE work/learning-session-model/ticket.md
+2026-10-03T10:12:38+02:00 WRITE work/learning-session-model/plan.md
+2026-10-03T10:12:43+02:00 WRITE work/learning-session-model/plan.md
+2026-10-03T10:21:11+02:00 WRITE src/apps/learning_sessions/tests/test_apps.py
+2026-10-03T10:21:31+02:00 TESTS red (after src/apps/learning_sessions/tests/test_apps.py)
+2026-10-03T10:21:31+02:00 WRITE src/apps/learning_sessions/tests/__init__.py
+2026-10-03T10:21:31+02:00 TESTS red (after src/apps/learning_sessions/tests/__init__.py)
+2026-10-03T10:21:41+02:00 WRITE src/apps/learning_sessions/__init__.py
+2026-10-03T10:22:00+02:00 TESTS red (after src/apps/learning_sessions/__init__.py)
+2026-10-03T10:22:00+02:00 WRITE src/apps/learning_sessions/apps.py
+2026-10-03T10:22:20+02:00 TESTS red (after src/apps/learning_sessions/apps.py)
+2026-10-03T10:22:20+02:00 WRITE src/apps/learning_sessions/migrations/__init__.py
+2026-10-03T10:22:40+02:00 TESTS red (after src/apps/learning_sessions/migrations/__init__.py)
+2026-10-03T10:22:40+02:00 WRITE src/config/settings.py
+2026-10-03T10:23:00+02:00 TESTS green (after src/config/settings.py)
+2026-10-03T10:23:26+02:00 WRITE work/learning-session-model/plan.md
