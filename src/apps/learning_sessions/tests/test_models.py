@@ -79,3 +79,20 @@ def test_goal_sessions_contains_exactly_that_goals_sessions(user, goal):
     LearningSession.objects.create(goal=other_goal, date=date(2026, 9, 3), duration_minutes=15)
 
     assert set(goal.sessions.all()) == {first, second}
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("duration_minutes", "valid"),
+    [(0, False), (-5, False), (1, True)],
+    ids=["zero", "negative", "one-minute"],
+)
+def test_full_clean_requires_a_duration_of_at_least_one_minute(goal, duration_minutes, valid):
+    session = LearningSession(goal=goal, date=date(2026, 9, 1), duration_minutes=duration_minutes)
+
+    if valid:
+        session.full_clean()
+    else:
+        with pytest.raises(ValidationError) as excinfo:
+            session.full_clean()
+        assert set(excinfo.value.error_dict) == {"duration_minutes"}
