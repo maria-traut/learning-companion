@@ -22,7 +22,7 @@ the rest alone.
 - [x] goal-detail: #7 Goal detail, edit and delete views, returning 404 for other users' goals (after goal list/create ships) — see work/goal-detail/review.md
 - [x] goal-list-filter: #8 Filter the goal list by `status` via a query parameter (after goal list/create ships) — see work/goal-list-filter/review.md
 ## Learning sessions
-- [ ] #9 LearningSession model linked to a Goal (`date`, `duration`, `notes`, `tags`), with migration and admin (after goal model ships)
+- [x] learning-session-model: #9 LearningSession model linked to a Goal (`date`, `duration`, `notes`, `tags`), with migration and admin (after goal model ships) — see work/learning-session-model/review.md
 - [ ] #10 Learning session create, list, edit and delete views, reachable from the goal detail page and scoped to the goal owner (after learning session model and goal detail ship)
 ## Resource library
 - [ ] #11 Resource model linked to a Goal (`url`, `title`, `type` article/video/repo/doc), with migration and admin (after goal model ships)

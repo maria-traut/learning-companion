@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'apps.pages',
     'apps.accounts',
     'apps.goals',
+    'apps.learning_sessions',
 ]
 
 MIDDLEWARE = [
