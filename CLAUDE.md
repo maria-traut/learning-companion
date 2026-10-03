@@ -24,7 +24,7 @@ All application source code lives in `src/` (pytest adds it to the path via `pyt
 
 - `src/manage.py` — Django management entry point.
 - `src/config/` — Django project package (settings, root URLconf, WSGI/ASGI). Settings read env vars via django-environ from the repo-root `.env` (template: `.env.example`). Never hardcode secrets; `OPENAI_API_KEY` goes in `.env`.
-- `src/apps/<name>/` — one Django app per domain area (e.g. `accounts`, `goals`, `resources`, `ai`, `dashboard`), imported as `apps.<name>`. Each app keeps its own `urls.py`, `templates/<name>/`, and `tests/`.
+- `src/apps/<name>/` — one Django app per domain area (e.g. `accounts`, `goals`, `learning_sessions`, `resources`, `ai`, `dashboard`), imported as `apps.<name>`. Learning sessions live in `learning_sessions`, not `sessions`, because that label clashes with `django.contrib.sessions`. Each app keeps its own `urls.py`, `templates/<name>/`, and `tests/`.
 - `src/templates/` — project-wide templates (`base.html` layout, auth templates under `registration/`). UI is server-rendered with Pico.css from CDN; no JS build step.
 - `src/static/` — project-wide static files.
 - `tests/` — project-level tests (smoke tests, cross-app behaviour) at the repo root.

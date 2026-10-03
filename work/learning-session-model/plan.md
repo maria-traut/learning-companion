@@ -78,7 +78,7 @@
   - A POST with no tags re-renders with a `tags` error and creates no session.
   - The same POST with one tag returns 302 and creates the session.
   Test: `tests/test_admin.py`. Impl: none expected, because the model has no `blank=True` on `tags`, so this is a guard test. Covers AC8.
-- [ ] 20. Wrap-up, with no new test: run `.venv/bin/ruff check .`, `.venv/bin/python src/manage.py check`, and the full `.venv/bin/pytest`. Update the `CLAUDE.md` architecture list if it needs it.
+- [x] 20. Wrap-up, with no new test: run `.venv/bin/ruff check .`, `.venv/bin/python src/manage.py check`, and the full `.venv/bin/pytest`. Update the `CLAUDE.md` architecture list if it needs it.
 
 (All test paths are under `src/apps/learning_sessions/`.)
 
