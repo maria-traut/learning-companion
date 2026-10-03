@@ -36,3 +36,12 @@ def test_full_clean_rejects_a_duplicate_tag_name():
 
     assert set(excinfo.value.error_dict) == {"name"}
     assert [e.code for e in excinfo.value.error_dict["name"]] == ["unique"]
+
+
+@pytest.mark.django_db
+def test_tags_are_listed_by_name():
+    orm = Tag.objects.create(name="orm")
+    django = Tag.objects.create(name="django")
+    python = Tag.objects.create(name="python")
+
+    assert list(Tag.objects.all()) == [django, orm, python]
