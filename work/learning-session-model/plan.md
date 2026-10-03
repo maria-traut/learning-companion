@@ -74,7 +74,7 @@
 - [x] 16. The session admin sidebar has "By date" and "By tags" filters, and `?tags__id__exact=<id>` lists only sessions with that tag. Test: `tests/test_admin.py`. Impl: `list_filter`. Covers AC13.
 - [x] 17. Searching the session admin with `?q=` matches sessions by notes and by goal title. Test: `tests/test_admin.py`. Impl: `search_fields`. Covers AC13.
 - [x] 18. The Tag admin is registered: its list page returns 200, and `?q=` filters tags by name. Test: `tests/test_admin.py`. Impl: `TagAdmin`. Covers AC13 and AC2.
-- [ ] 19. The session admin add page:
+- [x] 19. The session admin add page:
   - A POST with no tags re-renders with a `tags` error and creates no session.
   - The same POST with one tag returns 302 and creates the session.
   Test: `tests/test_admin.py`. Impl: none expected, because the model has no `blank=True` on `tags`, so this is a guard test. Covers AC8.

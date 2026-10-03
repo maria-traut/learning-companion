@@ -9,6 +9,7 @@ from apps.learning_sessions.models import LearningSession, Tag
 PASSWORD = "correct-horse-battery-9"
 DESCRIPTION = "Work through the official tutorial."
 SESSION_LIST = "/admin/learning_sessions/learningsession/"
+SESSION_ADD = "/admin/learning_sessions/learningsession/add/"
 TAG_LIST = "/admin/learning_sessions/tag/"
 
 
@@ -83,3 +84,21 @@ def test_admin_tag_list_can_be_searched_by_name(admin_client):
 
     assert response.status_code == 200
     assert set(response.context["cl"].result_list) == {django, django_orm}
+
+
+@pytest.mark.django_db
+def test_admin_add_session_requires_at_least_one_tag(admin_client, goal):
+    django = Tag.objects.create(name="django")
+    data = {"goal": goal.pk, "date": "2026-09-01", "duration_minutes": 45, "notes": ""}
+
+    without_tags = admin_client.post(SESSION_ADD, data)
+
+    assert without_tags.status_code == 200
+    assert "tags" in without_tags.context["adminform"].form.errors
+    assert not LearningSession.objects.exists()
+
+    with_tag = admin_client.post(SESSION_ADD, {**data, "tags": [django.pk]})
+
+    assert with_tag.status_code == 302
+    session = LearningSession.objects.get()
+    assert set(session.tags.all()) == {django}
