@@ -63,7 +63,7 @@
 - [x] 9. A session created without a `date` gets `timezone.localdate()`. Test: `tests/test_models.py`. Impl: `default=timezone.localdate`, plus a migration. Covers AC4.
 - [x] 10. `full_clean` rejects `localdate() + 1 day` with error key `date`, and accepts today and `localdate() - 30 days`. Test: `tests/test_models.py` (parametrized). Impl: `validate_not_in_future` in `models.py` (or `validators.py`) attached to `date`, plus a migration. Covers AC7.
 - [x] 11. A session can carry several tags, and a tag can be on several sessions, reachable through `tag.sessions`. Test: `tests/test_models.py`. Impl: `related_name="sessions"` on `tags`, if step 5 didn't already set it. Covers AC12 and AC3.
-- [ ] 12. Sessions list newest `date` first; sessions on the same date list newest `created_at` first. Timestamps are set with `QuerySet.update()`. Test: `tests/test_models.py`. Impl: `Meta.ordering = ["-date", "-created_at"]`, plus a migration. Covers AC9.
+- [x] 12. Sessions list newest `date` first; sessions on the same date list newest `created_at` first. Timestamps are set with `QuerySet.update()`. Test: `tests/test_models.py`. Impl: `Meta.ordering = ["-date", "-created_at"]`, plus a migration. Covers AC9.
 - [ ] 13. Deletion, in three cases:
   - Deleting a goal deletes its sessions.
   - Deleting a tag removes it from the session's tags but keeps the session.

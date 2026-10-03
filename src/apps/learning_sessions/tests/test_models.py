@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from django.core.exceptions import ValidationError
@@ -153,3 +153,30 @@ def test_sessions_and_tags_are_many_to_many(goal):
     assert set(first.tags.all()) == {django, orm}
     assert set(django.sessions.all()) == {first, second}
     assert set(orm.sessions.all()) == {first}
+
+
+@pytest.mark.django_db
+def test_sessions_are_listed_newest_date_first_then_newest_created_first(goal):
+    older_day = LearningSession.objects.create(
+        goal=goal, date=date(2026, 9, 2), duration_minutes=30
+    )
+    newer_day = LearningSession.objects.create(
+        goal=goal, date=date(2026, 9, 3), duration_minutes=30
+    )
+    same_day_early = LearningSession.objects.create(
+        goal=goal, date=date(2026, 9, 2), duration_minutes=30
+    )
+    same_day_late = LearningSession.objects.create(
+        goal=goal, date=date(2026, 9, 2), duration_minutes=30
+    )
+    for session, hour in ((older_day, 12), (same_day_early, 9), (same_day_late, 18)):
+        LearningSession.objects.filter(pk=session.pk).update(
+            created_at=datetime(2026, 9, 2, hour, tzinfo=UTC)
+        )
+
+    assert list(LearningSession.objects.all()) == [
+        newer_day,
+        same_day_late,
+        older_day,
+        same_day_early,
+    ]
