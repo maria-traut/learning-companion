@@ -6,6 +6,19 @@ from django.core.exceptions import ValidationError
 from apps.goals.models import Goal
 from apps.learning_sessions.models import LearningSession, Tag
 
+PASSWORD = "correct-horse-battery-9"
+DESCRIPTION = "Work through the official tutorial."
+
+
+@pytest.fixture
+def user(django_user_model):
+    return django_user_model.objects.create_user(username="ada", password=PASSWORD)
+
+
+@pytest.fixture
+def goal(user):
+    return Goal.objects.create(user=user, title="Learn Django", description=DESCRIPTION)
+
 
 def test_tag_displays_as_its_name():
     tag = Tag(name="django")
@@ -56,3 +69,13 @@ def test_session_displays_as_goal_title_date_and_duration():
     )
 
     assert str(session) == "Learn Django – 2026-09-07 (45 min)"
+
+
+@pytest.mark.django_db
+def test_goal_sessions_contains_exactly_that_goals_sessions(user, goal):
+    other_goal = Goal.objects.create(user=user, title="Learn SQL", description=DESCRIPTION)
+    first = LearningSession.objects.create(goal=goal, date=date(2026, 9, 1), duration_minutes=30)
+    second = LearningSession.objects.create(goal=goal, date=date(2026, 9, 2), duration_minutes=60)
+    LearningSession.objects.create(goal=other_goal, date=date(2026, 9, 3), duration_minutes=15)
+
+    assert set(goal.sessions.all()) == {first, second}

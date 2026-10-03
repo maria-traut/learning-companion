@@ -57,7 +57,7 @@
 - [x] 3. `Tag.full_clean` rejects an empty name, a name over 50 characters, and a duplicate name; it accepts 50 characters. Test: `tests/test_models.py` (parametrized, plus a duplicate case). Impl: `max_length=50`, `unique=True`, and a migration if needed. Covers AC2.
 - [x] 4. Tags list in name order. Test: `tests/test_models.py`. Impl: `Tag.Meta.ordering`, plus a migration. Covers AC2.
 - [x] 5. A session displays as `"<goal title> – <YYYY-MM-DD> (<n> min)"`, using an unsaved instance with an unsaved goal. Test: `tests/test_models.py`. Impl: the `LearningSession` model (`goal`, `date`, `duration_minutes`, `notes`, `tags`, `created_at`), `__str__`, and migration `0002`. Covers AC3 and AC10.
-- [ ] 6. `goal.sessions` returns that goal's sessions. Test: `tests/test_models.py`. Impl: `related_name="sessions"`, if step 5 didn't already set it. Covers AC3.
+- [x] 6. `goal.sessions` returns that goal's sessions. Test: `tests/test_models.py`. Impl: `related_name="sessions"`, if step 5 didn't already set it. Covers AC3.
 - [ ] 7. `full_clean` rejects `duration_minutes` of 0 and -5 with error key `duration_minutes`, and accepts 1. Test: `tests/test_models.py` (parametrized). Impl: `MinValueValidator(1)`, plus a migration. Covers AC5.
 - [ ] 8. `full_clean` reports errors for both `goal` and `date` when they are missing, and accepts `notes=""`. Test: `tests/test_models.py`. Impl: `notes` gets `blank=True`, plus a migration. Covers AC6 and AC3.
 - [ ] 9. A session created without a `date` gets `timezone.localdate()`. Test: `tests/test_models.py`. Impl: `default=timezone.localdate`, plus a migration. Covers AC4.

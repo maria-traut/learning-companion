@@ -14,7 +14,7 @@ class Tag(models.Model):
 
 
 class LearningSession(models.Model):
-    goal = models.ForeignKey(Goal, on_delete=models.CASCADE)
+    goal = models.ForeignKey(Goal, on_delete=models.CASCADE, related_name="sessions")
     date = models.DateField()
     duration_minutes = models.PositiveIntegerField()
 
