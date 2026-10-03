@@ -118,3 +118,10 @@
 2026-10-03T11:44:24+02:00 WRITE src/apps/learning_sessions/admin.py
 2026-10-03T11:44:46+02:00 TESTS green (after src/apps/learning_sessions/admin.py)
 2026-10-03T11:45:36+02:00 WRITE work/learning-session-model/plan.md
+2026-10-03T11:46:24+02:00 WRITE src/apps/learning_sessions/tests/test_admin.py
+2026-10-03T11:46:47+02:00 TESTS red (after src/apps/learning_sessions/tests/test_admin.py)
+2026-10-03T11:46:47+02:00 WRITE src/apps/learning_sessions/tests/test_admin.py
+2026-10-03T11:47:09+02:00 TESTS red (after src/apps/learning_sessions/tests/test_admin.py)
+2026-10-03T11:47:18+02:00 WRITE src/apps/learning_sessions/admin.py
+2026-10-03T11:47:40+02:00 TESTS green (after src/apps/learning_sessions/admin.py)
+2026-10-03T11:48:09+02:00 WRITE work/learning-session-model/plan.md
