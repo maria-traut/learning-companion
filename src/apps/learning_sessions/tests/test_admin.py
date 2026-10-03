@@ -52,3 +52,21 @@ def test_admin_session_list_can_be_filtered_by_date_and_tags(admin_client, goal)
     for label in ("django", "orm"):
         assert re.search(rf">\s*{label}\s*</a>", sidebar.group(1)), label
     assert list(by_tag.context["cl"].result_list) == [tagged]
+
+
+@pytest.mark.django_db
+def test_admin_session_list_can_be_searched_by_notes_and_goal_title(admin_client, user, goal):
+    sql_goal = Goal.objects.create(user=user, title="Learn SQL", description=DESCRIPTION)
+    by_notes = LearningSession.objects.create(
+        goal=sql_goal, date=date(2026, 9, 1), duration_minutes=30, notes="Read the Django ORM docs"
+    )
+    by_goal_title = LearningSession.objects.create(
+        goal=goal, date=date(2026, 9, 2), duration_minutes=30, notes="Tutorial part 2"
+    )
+    LearningSession.objects.create(
+        goal=sql_goal, date=date(2026, 9, 3), duration_minutes=30, notes="Joins"
+    )
+
+    response = admin_client.get(SESSION_LIST, {"q": "django"})
+
+    assert set(response.context["cl"].result_list) == {by_notes, by_goal_title}

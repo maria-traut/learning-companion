@@ -72,7 +72,7 @@
 - [x] 14. No migrations are pending for `learning_sessions`: `call_command("makemigrations", "learning_sessions", "--check", "--dry-run")` does not raise `SystemExit`. Test: `tests/test_migrations.py`. Impl: none if the migrations are current, so this is a guard test. Covers AC1.
 - [x] 15. The session admin list page returns 200 and shows the `goal`, `date` and `duration_minutes` columns. Test: `tests/test_admin.py`. Impl: `admin.py` (`LearningSessionAdmin`, `list_display`). Covers AC13.
 - [x] 16. The session admin sidebar has "By date" and "By tags" filters, and `?tags__id__exact=<id>` lists only sessions with that tag. Test: `tests/test_admin.py`. Impl: `list_filter`. Covers AC13.
-- [ ] 17. Searching the session admin with `?q=` matches sessions by notes and by goal title. Test: `tests/test_admin.py`. Impl: `search_fields`. Covers AC13.
+- [x] 17. Searching the session admin with `?q=` matches sessions by notes and by goal title. Test: `tests/test_admin.py`. Impl: `search_fields`. Covers AC13.
 - [ ] 18. The Tag admin is registered: its list page returns 200, and `?q=` filters tags by name. Test: `tests/test_admin.py`. Impl: `TagAdmin`. Covers AC13 and AC2.
 - [ ] 19. The session admin add page:
   - A POST with no tags re-renders with a `tags` error and creates no session.
