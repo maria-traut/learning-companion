@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 from django.core.exceptions import ValidationError
@@ -120,3 +120,21 @@ def test_session_date_defaults_to_today(goal):
     session = LearningSession.objects.create(goal=goal, duration_minutes=30)
 
     assert session.date == timezone.localdate()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("days_from_today", "valid"),
+    [(1, False), (0, True), (-30, True)],
+    ids=["tomorrow", "today", "a-month-ago"],
+)
+def test_full_clean_rejects_a_session_date_after_today(goal, days_from_today, valid):
+    session_date = timezone.localdate() + timedelta(days=days_from_today)
+    session = LearningSession(goal=goal, date=session_date, duration_minutes=30)
+
+    if valid:
+        session.full_clean()
+    else:
+        with pytest.raises(ValidationError) as excinfo:
+            session.full_clean()
+        assert set(excinfo.value.error_dict) == {"date"}
