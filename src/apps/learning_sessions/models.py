@@ -26,6 +26,7 @@ class LearningSession(models.Model):
     date = models.DateField(default=timezone.localdate, validators=[validate_not_in_future])
     duration_minutes = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     notes = models.TextField(blank=True)
+    tags = models.ManyToManyField(Tag, related_name="sessions")
 
     def __str__(self):
         return f"{self.goal.title} – {self.date:%Y-%m-%d} ({self.duration_minutes} min)"

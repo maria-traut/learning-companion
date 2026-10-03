@@ -138,3 +138,18 @@ def test_full_clean_rejects_a_session_date_after_today(goal, days_from_today, va
         with pytest.raises(ValidationError) as excinfo:
             session.full_clean()
         assert set(excinfo.value.error_dict) == {"date"}
+
+
+@pytest.mark.django_db
+def test_sessions_and_tags_are_many_to_many(goal):
+    django = Tag.objects.create(name="django")
+    orm = Tag.objects.create(name="orm")
+    first = LearningSession.objects.create(goal=goal, date=date(2026, 9, 1), duration_minutes=30)
+    second = LearningSession.objects.create(goal=goal, date=date(2026, 9, 2), duration_minutes=60)
+
+    first.tags.add(django, orm)
+    second.tags.add(django)
+
+    assert set(first.tags.all()) == {django, orm}
+    assert set(django.sessions.all()) == {first, second}
+    assert set(orm.sessions.all()) == {first}
