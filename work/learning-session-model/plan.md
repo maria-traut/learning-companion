@@ -54,7 +54,7 @@
 ## Steps
 - [x] 1. The app `apps.learning_sessions` is installed (`django.apps.apps.is_installed`). Test: `src/apps/learning_sessions/tests/test_apps.py`. Impl: `startapp`, `apps.py` (`name`), `INSTALLED_APPS` in `src/config/settings.py`, and a `tests/__init__.py`. Covers AC1.
 - [x] 2. A `Tag` displays as its name (unsaved instance, no DB). Test: `tests/test_models.py`. Impl: `models.py` (`Tag.name`, `__str__`), plus migration `0001_initial`. Covers AC2.
-- [ ] 3. `Tag.full_clean` rejects an empty name, a name over 50 characters, and a duplicate name; it accepts 50 characters. Test: `tests/test_models.py` (parametrized, plus a duplicate case). Impl: `max_length=50`, `unique=True`, and a migration if needed. Covers AC2.
+- [x] 3. `Tag.full_clean` rejects an empty name, a name over 50 characters, and a duplicate name; it accepts 50 characters. Test: `tests/test_models.py` (parametrized, plus a duplicate case). Impl: `max_length=50`, `unique=True`, and a migration if needed. Covers AC2.
 - [ ] 4. Tags list in name order. Test: `tests/test_models.py`. Impl: `Tag.Meta.ordering`, plus a migration. Covers AC2.
 - [ ] 5. A session displays as `"<goal title> – <YYYY-MM-DD> (<n> min)"`, using an unsaved instance with an unsaved goal. Test: `tests/test_models.py`. Impl: the `LearningSession` model (`goal`, `date`, `duration_minutes`, `notes`, `tags`, `created_at`), `__str__`, and migration `0002`. Covers AC3 and AC10.
 - [ ] 6. `goal.sessions` returns that goal's sessions. Test: `tests/test_models.py`. Impl: `related_name="sessions"`, if step 5 didn't already set it. Covers AC3.
