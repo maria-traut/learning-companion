@@ -96,3 +96,19 @@ def test_full_clean_requires_a_duration_of_at_least_one_minute(goal, duration_mi
         with pytest.raises(ValidationError) as excinfo:
             session.full_clean()
         assert set(excinfo.value.error_dict) == {"duration_minutes"}
+
+
+def test_full_clean_requires_a_goal_and_a_date():
+    session = LearningSession(date=None, duration_minutes=30)
+
+    with pytest.raises(ValidationError) as excinfo:
+        session.full_clean()
+
+    assert set(excinfo.value.error_dict) == {"goal", "date"}
+
+
+@pytest.mark.django_db
+def test_full_clean_accepts_empty_notes(goal):
+    session = LearningSession(goal=goal, date=date(2026, 9, 1), duration_minutes=30, notes="")
+
+    session.full_clean()

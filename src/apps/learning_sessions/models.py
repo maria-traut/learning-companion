@@ -18,6 +18,7 @@ class LearningSession(models.Model):
     goal = models.ForeignKey(Goal, on_delete=models.CASCADE, related_name="sessions")
     date = models.DateField()
     duration_minutes = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    notes = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.goal.title} – {self.date:%Y-%m-%d} ({self.duration_minutes} min)"
