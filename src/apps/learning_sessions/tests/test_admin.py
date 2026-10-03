@@ -9,6 +9,7 @@ from apps.learning_sessions.models import LearningSession, Tag
 PASSWORD = "correct-horse-battery-9"
 DESCRIPTION = "Work through the official tutorial."
 SESSION_LIST = "/admin/learning_sessions/learningsession/"
+TAG_LIST = "/admin/learning_sessions/tag/"
 
 
 @pytest.fixture
@@ -70,3 +71,15 @@ def test_admin_session_list_can_be_searched_by_notes_and_goal_title(admin_client
     response = admin_client.get(SESSION_LIST, {"q": "django"})
 
     assert set(response.context["cl"].result_list) == {by_notes, by_goal_title}
+
+
+@pytest.mark.django_db
+def test_admin_tag_list_can_be_searched_by_name(admin_client):
+    django = Tag.objects.create(name="django")
+    django_orm = Tag.objects.create(name="django-orm")
+    Tag.objects.create(name="sql")
+
+    response = admin_client.get(TAG_LIST, {"q": "django"})
+
+    assert response.status_code == 200
+    assert set(response.context["cl"].result_list) == {django, django_orm}
